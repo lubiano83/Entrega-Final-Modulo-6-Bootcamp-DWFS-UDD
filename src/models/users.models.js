@@ -7,7 +7,7 @@ const collection = "users";
 const userSchema = new mongoose.Schema({
     image: {
         type: String,
-        default: ""
+        default: "../public/user-circle-svgrepo-com.svg"
     },
     first_name: {
         type: String,

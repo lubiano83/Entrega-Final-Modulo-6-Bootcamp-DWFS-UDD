@@ -13,7 +13,7 @@ export default class UsersControllers {
             const users = await usersDao.getUsers();
             return res.status(200).send({ message: "Todos los usuarios..", users });
         } catch (error) {
-            res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
+            return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
     };
 
@@ -68,10 +68,10 @@ export default class UsersControllers {
             const { id } = req.params;
             const user = await usersDao.getUserById(id);
             if(!user) return res.status(400).send({ message: "Ese usuario no existe.." });
-            const { first_name, last_name, email, phone, address } = req.body;
+            const { first_name, last_name, phone, address } = req.body;
             const { country, state, city, street, number } = address;
-            if( !first_name || !last_name || !phone || !email || !country || !state || !city || !street || !number ) return res.status(400).send({ message: "Todos los campos son requeridos.." });
-            const updatedUser = { first_name: first_name.toLowerCase(), last_name: last_name.toLowerCase(), email: String(email), address: { country: country.toLowerCase(), state: state.toLowerCase(), city: city.toLowerCase(), street: street.toLowerCase(), number: String(number) }};
+            if( !first_name || !last_name || !phone || !country || !state || !city || !street || !number ) return res.status(400).send({ message: "Todos los campos son requeridos.." });
+            const updatedUser = { first_name: first_name.toLowerCase(), last_name: last_name.toLowerCase(), address: { country: country.toLowerCase(), state: state.toLowerCase(), city: city.toLowerCase(), street: street.toLowerCase(), number: String(number) }};
             await usersDao.updateUserById(id, updatedUser);
             return res.status(200).send({ message: "Usuario actualizado con exito.." });
         } catch (error) {
@@ -79,19 +79,55 @@ export default class UsersControllers {
         }
     };
 
-    changeImage = async(req, res) => {
+    changeImageById = async(req, res) => {
         try {
-            
+            const { id } = req.params;
+            const user = await usersDao.getUserById(id);
+            if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
+            if (!req.file) return res.status(400).json({ message: "No se ha subido ninguna imagen.." });
+            const baseUrl = `${req.protocol}://${req.get("host")}`;
+            let oldFilename = user.image;
+            if (oldFilename && oldFilename.startsWith("http")) oldFilename = oldFilename.split("/").pop();
+            if (oldFilename && oldFilename !== "user-circle-svgrepo-com.svg") {
+                const oldImagePath = path.join(process.cwd(), "src/public/profile", oldFilename);
+                if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
+            };
+            const changedImage = { image: `${baseUrl}/${req.file.filename}` };
+            await usersDao.updateUserById(id, changedImage);
+            return res.status(200).send({ message: "Imagen cambiada con éxito." });
         } catch (error) {
-            return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
+            return res.status(500).json({ message: "Error al obtener datos desde el servidor.", error: error.message });
         }
     };
+
+    changeRoleById = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const { role } = req.body;
+            const user = await usersDao.getUserById(id);
+            if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
+            const newRole = role.toLowerCase();
+            const validRoles = ["user", "admin", "developer"];
+            if (!validRoles.includes(newRole)) return res.status(400).send({ message: "Ese role no está habilitado.." });
+            const modifiedRole = { role: newRole };
+            await usersDao.updateUserById(id, modifiedRole);
+            return res.status(200).send({ message: "Role actualizado con exito.." });
+        } catch (error) {
+            return res.status(500).json({ message: "Error al obtener datos desde el servidor.", error: error.message });
+        }
+    }; 
 
     deleteUserById = async(req, res) => {
         try {
             const { id } = req.params;
             const user = await usersDao.getUserById(id);
             if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
+            if (user.image && !user.image.includes("user-circle-svgrepo-com.svg")) {
+                let filename = user.image;
+                if (filename.startsWith("http")) filename = filename.split("/").pop();
+                const imagePath = path.join(process.cwd(), "src/public/profile", filename);
+                if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+            };
             await usersDao.deleteUserById(id);
             return res.status(200).send({ message: "Usuario eliminado con exito.." });
         } catch (error) {
@@ -101,9 +137,17 @@ export default class UsersControllers {
 
     deleteAllUsers = async(req, res) => {
         try {
-            await usersDao.deleteAllUsers();
             const users = await usersDao.getUsers();
-            return res.status(200).send({ message: "Todos los usuarios eliminados con exito..", users });
+            users.docs.forEach(user => {
+                if (user.image && !user.image.includes("user-circle-svgrepo-com.svg")) {
+                    let filename = user.image;
+                    if (filename.startsWith("http")) filename = filename.split("/").pop();
+                    const imagePath = path.join(process.cwd(), "src/public/profile", filename);
+                    if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+                }
+            });
+            await usersDao.deleteAllUsers();
+            return res.status(200).send({ message: "Todos los usuarios eliminados con exito.." });
         } catch (error) {
             return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
