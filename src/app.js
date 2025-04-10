@@ -1,5 +1,6 @@
 import express from "express";
 import usersRouter from "./routes/users.router.js";
+import seasonsRouter from "./routes/seasons.router.js";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
@@ -32,6 +33,7 @@ APP.use("/profile", express.static(path.join(process.cwd(), "src/public/profile"
 
 // Rutas
 APP.use("/api/users", usersRouter);
+APP.use("/api/seasons", seasonsRouter);
 
 // Listening
 APP.listen(PORT, () => console.log(`Escuchando en http://${HOST}:${PORT}`));
