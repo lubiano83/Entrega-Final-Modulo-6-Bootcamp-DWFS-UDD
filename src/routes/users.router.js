@@ -11,6 +11,8 @@ ROUTER.put("/:id", usersController.updateUserById);
 ROUTER.post("/register", usersController.registerUser);
 ROUTER.post("/login", usersController.loginUser);
 ROUTER.post("/logout", usersController.logoutUser);
+ROUTER.get("/registered", usersController.usersRegistered);
+ROUTER.get("/logged", usersController.usersLogged);
 ROUTER.patch("/image/:id", uploadProfile.single("image"), convertToWebp, usersController.changeImageById);
 ROUTER.patch("/role/:id", usersController.changeRoleById);
 ROUTER.delete("/delete/all", usersController.deleteAllUsers);

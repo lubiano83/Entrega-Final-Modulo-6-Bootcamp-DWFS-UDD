@@ -1,10 +1,12 @@
 import UsersDao from "../dao/users.dao.js";
+import SessionsDao from "../dao/sessions.dao.js";
 import { createHash, isValidPassword } from "../utils/bcrypt.utils.js";
 import jwt from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
 
 const usersDao = new UsersDao();
+const sessionsDao = new SessionsDao();
 
 export default class UsersControllers {
 
@@ -46,6 +48,7 @@ export default class UsersControllers {
             if ( userLogged ) return res.status( 200 ).send({ message: "Ese usuario ya está logeado.." });
             const token = jwt.sign({ email: users[0].email.toLowerCase(), first_name: users[0].first_name.toLowerCase(), last_name: users[0].last_name.toLowerCase(), phone: users[0].phone, role: users[0].role.toLowerCase(), id: users[0]._id.toString() }, process.env.COOKIE_KEY, { expiresIn: "1h" });
             res.cookie( process.env.COOKIE_NAME, token, { maxAge: 3600000, httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "none", path: "/" });
+            await sessionsDao.createSession(users[0]._id, token);
             return res.status( 200 ).json({ message: "Login realizado con éxito", token });
         } catch ( error ) {
             return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -57,6 +60,7 @@ export default class UsersControllers {
             const token = req.cookies[process.env.COOKIE_NAME];
             if (!token) return res.status(401).send({ message: "Token no encontrado, sesión cerrada.." });
             res.clearCookie(process.env.COOKIE_NAME, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "none", path: "/" });
+            await sessionsDao.deleteSession(token);
             return res.status(200).json({ message: "Logout realizado con éxito.." });
         } catch (error) {
             return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -150,6 +154,26 @@ export default class UsersControllers {
             return res.status(200).send({ message: "Todos los usuarios eliminados con exito.." });
         } catch (error) {
             return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
+    usersRegistered = async( req, res ) => {
+        try {
+            const users = await usersDao.getUsers();
+            const usersRegistered = users.docs.length;
+            return res.status( 200 ).json({ payload: usersRegistered });
+        } catch ( error ) {
+            res.status( 500 ).json({ message: "Error interno del servidor", error: error.message });
+        }
+    };
+
+    usersLogged = async( req, res ) => {
+        try {
+            const users = await sessionsDao.getSessions();
+            const usersOnline = users.length;
+            return res.status( 200 ).json({ payload: usersOnline });
+        } catch ( error ) {
+            res.status( 500 ).json({ message: "Error interno del servidor", error: error.message });
         }
     };
 
