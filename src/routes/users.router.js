@@ -1,6 +1,6 @@
 import { Router } from "express";
 import UsersControllers from "../controllers/users.controllers.js";
-import { uploadProfile, convertToWebp } from "../utils/uploader.utils.js";
+import { uploadProfile, convertToWebp } from "../middlewares/uploader.middlewares.js";
 
 const ROUTER = Router();
 const usersController = new UsersControllers();
