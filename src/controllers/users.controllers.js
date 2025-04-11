@@ -12,8 +12,54 @@ export default class UsersControllers {
 
     getUsers = async(req, res) => {
         try {
+            const { email, country, state, city, street, role, reservations, createdAt, sort } = req.query;
             const users = await usersDao.getUsers();
-            return res.status(200).send({ message: "Todos los usuarios..", users });
+            let filteredUsers = users;
+            if(email) filteredUsers = filteredUsers.filter(item => item.email === email.toLowerCase().trim());
+            if(country) filteredUsers = filteredUsers.filter(item => item.country === country.toLowerCase().trim());
+            if(state) filteredUsers = filteredUsers.filter(item => item.state === state.toLowerCase().trim());
+            if(city) filteredUsers = filteredUsers.filter(item => item.city === city.toLowerCase().trim());
+            if(street) filteredUsers = filteredUsers.filter(item => item.street === street.toLowerCase().trim());
+            if(role) filteredUsers = filteredUsers.filter(item => item.role === role.toLowerCase().trim());
+            if (createdAt) filteredUsers = filteredUsers.filter(item => item.createdAt === createdAt.toLowerCase().trim());
+
+            if (reservations) {
+                let sortOrder = reservations.toLowerCase().trim();
+                if (sortOrder === 'asc') {
+                    filteredUsers.sort((a, b) => b.reservations.length - a.reservations.length);
+                } else if (sortOrder === 'desc') {
+                    filteredUsers.sort((a, b) => a.reservations.length - b.reservations.length);
+                }
+            };
+
+            if (sort) {
+                let sortOrder = sort.toLowerCase().trim();
+                if (sortOrder === 'asc') {
+                    filteredUsers.sort((a, b) => {
+                        const dateA = new Date(a.createdAt.split('/').reverse().join('-'));
+                        const dateB = new Date(b.createdAt.split('/').reverse().join('-'));
+                        return dateA - dateB;
+                    });
+                } else if (sortOrder === 'desc') {
+                    filteredUsers.sort((a, b) => {
+                        const dateA = new Date(a.createdAt.split('/').reverse().join('-'));
+                        const dateB = new Date(b.createdAt.split('/').reverse().join('-'));
+                        return dateB - dateA;
+                    });
+                }
+            }
+
+            return res.status(200).send({ message: "Todos los usuarios..", payload: filteredUsers });
+        } catch (error) {
+            return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
+    getUserById = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const user = await usersDao.getUserById(id);
+            return res.status(200).send({ message: "Usuario obtenido por el id..", user });
         } catch (error) {
             return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
@@ -27,7 +73,7 @@ export default class UsersControllers {
             const existingUser = await usersDao.getUserByProperty({ email: email.toLowerCase() });
             if (existingUser.length > 0) return res.status(409).json({ message: "Ese email ya está registrado.." });
             if (password.length < 6 || password.length > 8) return res.status(400).json({ message: "La contraseña debe tener entre 6 y 8 caracteres.." });
-            const newUser = { first_name: first_name.toLowerCase(), last_name: last_name.toLowerCase(), phone: String(phone), email: String(email), password: await createHash(String(password)), address: { country: country.toLowerCase(), state: state.toLowerCase(), city: city.toLowerCase(), street: street.toLowerCase(), number: String(number) }};
+            const newUser = { first_name: first_name.toLowerCase(), last_name: last_name.toLowerCase(), phone: String(phone), email: email.toLowerCase(), password: await createHash(String(password)), address: { country: country.toLowerCase(), state: state.toLowerCase(), city: city.toLowerCase(), street: street.toLowerCase(), number: String(number) }};
             if(isNaN(Number(number))) return res.status(400).send({ message: "El campo number debe ser tipo numero.." });
             await usersDao.createUser(newUser);
             return res.status(200).json({ message: "Usuario registrado con exito.." });
@@ -160,7 +206,7 @@ export default class UsersControllers {
     usersRegistered = async( req, res ) => {
         try {
             const users = await usersDao.getUsers();
-            const usersRegistered = users.docs.length;
+            const usersRegistered = users.length;
             return res.status( 200 ).json({ payload: usersRegistered });
         } catch ( error ) {
             res.status( 500 ).json({ message: "Error interno del servidor", error: error.message });

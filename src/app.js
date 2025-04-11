@@ -1,6 +1,8 @@
 import express from "express";
 import usersRouter from "./routes/users.router.js";
+import sessionsRouter from "./routes/sessions.router.js";
 import seasonsRouter from "./routes/seasons.router.js";
+import lodgesRouter from "./routes/lodges.router.js";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
@@ -33,7 +35,9 @@ APP.use("/profile", express.static(path.join(process.cwd(), "src/public/profile"
 
 // Rutas
 APP.use("/api/users", usersRouter);
+APP.use("/api/sessions", sessionsRouter);
 APP.use("/api/seasons", seasonsRouter);
+APP.use("/api/lodges", lodgesRouter);
 
 // Listening
 APP.listen(PORT, () => console.log(`Escuchando en http://${HOST}:${PORT}`));
