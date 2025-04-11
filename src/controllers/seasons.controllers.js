@@ -7,7 +7,7 @@ export default class SeasonsController {
     getSeasons = async(req, res) => {
         try {
             const seasons = await seasonsDao.getSeasons();
-            return res.status(200).send({ message: "Todas las temporadas..", seasons });
+            return res.status(200).send({ message: "Todas las temporadas..", payload: seasons });
         } catch (error) {
             return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
