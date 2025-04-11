@@ -32,9 +32,9 @@ export default class UsersDao {
         }
     };
 
-    createUser = async( userData ) => {
+    createUser = async( data ) => {
         try {
-            const user = await UserModel( userData );
+            const user = await UserModel( data );
             await user.save();
             return user;
         } catch (error) {

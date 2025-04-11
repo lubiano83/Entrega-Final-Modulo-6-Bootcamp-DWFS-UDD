@@ -30,7 +30,7 @@ export default class LodgesControllers {
 
             return res.status(200).send({ message: "Todos los Lodges..", payload: filteredReservas });
         } catch (error) {
-          return res.status(500).json({ message: "Error al obtener datos desde el servidor.", error: error.message });
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
     };
 
@@ -42,7 +42,34 @@ export default class LodgesControllers {
             await lodgesDao.createLodge(lodgeCreated);
             return res.status(200).send({ message: "Lodge creado con exito.." });
         } catch (error) {
-            return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
+    addImageToLodge = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const { image } = req.body;
+            const lodge = await lodgesDao.getLodgesById(id);
+            if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
+            lodge.image.push(image);
+            await lodgesDao.updateLodgeById(id, { image: lodge.image });
+            return res.status(200).send({ message: "Imagen agregada con exito.." });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
+    deleteAllImageFromLodge = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const lodge = await lodgesDao.getLodgesById(id);
+            if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
+            lodge.image = [];
+            await lodgesDao.updateLodgeById(id, { image: lodge.image });
+            return res.status(200).send({ message: "Imagenes eliminadas con exito.." });
+        } catch (error) {
+            
         }
     };
 
@@ -51,7 +78,7 @@ export default class LodgesControllers {
             await lodgesDao.deleteAllLodges();
             return res.status(200).send({ message: "Todos los lodges eliminados con exito.." });
         } catch (error) {
-            return res.status( 500 ).json({ message: "Error al obtener datos desde el servidor..", error: error.message });
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
     }; 
 

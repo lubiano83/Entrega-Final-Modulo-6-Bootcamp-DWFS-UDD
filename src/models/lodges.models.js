@@ -6,7 +6,7 @@ const collection = "lodges";
 const lodgeSchema = new mongoose.Schema({
     image: {
         type: Array,
-        default: ""
+        default: []
     },
     hotel: {
         type: String,
