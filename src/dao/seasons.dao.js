@@ -11,7 +11,7 @@ export default class SeasonsDao {
         try {
             return await SeasonModel.find();
         } catch (error) {
-            throw new Error("Hubo un error al obtener los usuarios.." + error.message );
+            throw new Error("Hubo un error al obtener los usuarios..", error.message );
         }
     };
 
@@ -21,7 +21,7 @@ export default class SeasonsDao {
             await season.save();
             return season;
         } catch (error) {
-            throw new Error( "Error al crear un usuario: " + error.message );
+            throw new Error( "Error al crear un usuario..", error.message );
         }
     }
 
@@ -30,7 +30,7 @@ export default class SeasonsDao {
             const result = await SeasonModel.deleteMany({});
             return await this.getSeasons();
         } catch (error) {
-            throw new Error("Error al eliminar todos los usuarios: " + error.message);
+            throw new Error("Error al eliminar todos los usuarios..", error.message);
         }
     };    
 };

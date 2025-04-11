@@ -10,7 +10,7 @@ export default class SessionsDao {
         try {
             return await SessionModel.find();
         } catch ( error ) {
-            throw new Error( "Error al obtener las sesiones: " + error.message );
+            throw new Error( "Error al obtener las sesiones..", error.message );
         }
     };
 
@@ -22,7 +22,7 @@ export default class SessionsDao {
             await session.save();
             return session;
         } catch ( error ) {
-            throw new Error( "Error al crear una sesión: " + error.message );
+            throw new Error( "Error al crear una sesión..", error.message );
         }
     };
 
@@ -32,7 +32,7 @@ export default class SessionsDao {
             const session = await SessionModel.findOne({ userId });
             return session;
         } catch (error) {
-            throw new Error( "Error al obtener la sesión por el userId: " + error.message );
+            throw new Error( "Error al obtener la sesión por el userId..", error.message );
         }
     }
 
@@ -42,7 +42,7 @@ export default class SessionsDao {
             const session = await SessionModel.findOneAndDelete({ token });
             if ( !session ) throw new Error( "Sesión no encontrada" );
         } catch ( error ) {
-            throw new Error( "Error al cerrar una sesión: " + error.message );
+            throw new Error( "Error al cerrar una sesión..", error.message );
         }
     };
 
@@ -53,7 +53,16 @@ export default class SessionsDao {
             if ( !user ) throw new Error( "Usuario no encontrado" );
             return user;
         } catch ( error ) {
-            throw new Error( "Error al obtener un token: " + error.message );
+            throw new Error( "Error al obtener un token..", error.message );
         }
     };
+
+    deleteAllSessions = async () => {
+            try {
+                const result = await SessionModel.deleteMany({});
+                return await this.getSessions();
+            } catch (error) {
+                throw new Error("Error al eliminar todos los usuarios..", error.message);
+            }
+        };    
 }
