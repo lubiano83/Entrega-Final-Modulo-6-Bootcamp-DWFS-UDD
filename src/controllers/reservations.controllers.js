@@ -2,12 +2,15 @@ import UsersDao from "../dao/users.dao.js";
 import SeasonsDao from "../dao/seasons.dao.js";
 import LodgesDao from "../dao/lodges.dao.js";
 import ReservationsDao from "../dao/reservations.dao.js";
+import RecordsDao from "../dao/records.dao.js";
 import { sendReservationEmail } from "../utils/nodemailer.utils.js";
+import moment from "moment";
 
 const usersDao = new UsersDao();
 const seasonsDao = new SeasonsDao();
 const lodgesDao = new LodgesDao();
 const reservationsDao = new ReservationsDao();
+const recordsDao = new RecordsDao();
 
 export default class ReservationsController {
 
@@ -73,6 +76,17 @@ export default class ReservationsController {
         }
     };
 
+    getReservationById = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const reservation = await reservationsDao.getById(id);
+            if(!reservation) return res.status(404).send({ message: "Esa reserva no existe.." });
+            return res.status(200).send({ message: "Reserva obtenida por el id..", payload: reservation });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
     createReservation = async(req, res) => {
         try {
             const { userId, lodgeId } = req.params;
@@ -91,8 +105,36 @@ export default class ReservationsController {
             if (conflict) return res.status(400).send({ message: "Esta cabaña ya está reservada en las fechas seleccionadas.." });
             const emailResponse = await sendReservationEmail(modifiedData);
             if (!emailResponse.success) return res.status(500).send({ message: "Reserva creada, pero hubo un error al enviar el email.", error: emailResponse.error });
-            const reserva = await reservationsDao.create(modifiedData);
-            return res.status(201).send([{ message: "Reserva creada con éxito..", modifiedData }]);
+            await reservationsDao.create(modifiedData);
+            return res.status(201).send({ message: "Reserva creada con éxito.." });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
+    updateReservationById = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const reservation = await reservationsDao.getById(id);
+            if(!reservation) return res.status(404).send({ message: "Esa reserva no existe.." });
+            const { lodge, people, arrive, leave } = req.body;
+            const updatedReservation = { lodge: String(lodge), people: Number(people), arrive: moment(arrive, "DD/MM/YYYY"), leave: moment(leave, "DD/MM/YYYY") };
+            const conflict = await this.#confirmReservationDate(updatedReservation, updatedReservation.lodge);
+            if (conflict) return res.status(400).send({ message: "Esta cabaña ya está reservada en las fechas seleccionadas.." });
+            await reservationsDao.updateById(id, updatedReservation);
+            return res.status(200).send({ message: "Reserva modificada con exito.." });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
+    deleteReservationById = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const reservation = await reservationsDao.getById(id);
+            if(!reservation) return res.status(404).send({ message: "Esa reserva no existe.." });
+            await reservationsDao.deleteById(id);
+            return res.status(200).send({ message: "Reserva eliminada con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
@@ -102,6 +144,21 @@ export default class ReservationsController {
         try {
             await reservationsDao.deleteAll();
             return res.status(200).send({ message: "Todas las reservas eliminadas.." });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
+    isAlreadyPaid = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const reservation = await reservationsDao.getById(id);
+            if(!reservation) return res.status(404).send({ message: "Esa reserva no existe.." });
+            await reservationsDao.updateById(id, { paid: !reservation.paid });
+            const recordData = { lodge: String(reservation.lodge), user: String(reservation.user), people: Number(reservation.people), arrive: moment(reservation.arrive, "DD/MM/YYYY"), leave: moment(reservation.leave, "DD/MM/YYYY"), price: Number(reservation.price), paid: reservation.paid };
+            await recordsDao.create(recordData);
+            await reservationsDao.deleteById(id);
+            return res.status(201).send({ message: "Reserva pagada con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }

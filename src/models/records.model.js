@@ -1,9 +1,9 @@
 import mongoose from "mongoose";
 import paginate from "mongoose-paginate-v2";
 
-const collection = "reservations";
+const collection = "records";
 
-const reservationSchema = new mongoose.Schema({
+const recordSchema = new mongoose.Schema({
     lodge: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "lodges"
@@ -36,7 +36,7 @@ const reservationSchema = new mongoose.Schema({
     }
 });
 
-reservationSchema.plugin(paginate);
+recordSchema.plugin(paginate);
 
-const ReservationModel = mongoose.models[collection] || mongoose.model(collection, reservationSchema);
-export default ReservationModel;
+const RecordModel = mongoose.models[collection] || mongoose.model(collection, recordSchema);
+export default RecordModel;
