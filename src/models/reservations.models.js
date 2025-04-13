@@ -4,11 +4,11 @@ import paginate from "mongoose-paginate-v2";
 const collection = "reservations";
 
 const reservationsSchema = new mongoose.Schema({
-    lodgeId: {
+    lodge: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "lodges"
     },
-    userId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users"
     },

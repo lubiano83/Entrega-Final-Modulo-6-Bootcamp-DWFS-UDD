@@ -11,7 +11,7 @@ export default class ReservationsDao {
         try {
             return await ReservationModel.find();
         } catch (error) {
-            throw new Error("Hubo un error al obtener los lodges..", error.message );
+            throw new Error("Hubo un error en el servidor..", error.message );
         }
     };
 
@@ -20,7 +20,7 @@ export default class ReservationsDao {
             if (!isValidId(id)) throw new Error("ID no válido");
             return await ReservationModel.findOne({ _id: id });
         } catch (error) {
-            throw new Error( "Error al obtener el lodge por el id..", error.message );
+            throw new Error( "Hubo un error en el servidor..", error.message );
         }
     }
 
@@ -28,39 +28,39 @@ export default class ReservationsDao {
         try {
             return await ReservationModel.find( doc );
         } catch (error) {
-            throw new Error( "Error al obtener el lodge por la propiedad..", error.message );
+            throw new Error( "Hubo un error en el servidor..", error.message );
         }
     };
 
-    create = async( userData ) => {
+    create = async( data ) => {
         try {
-            const user = await ReservationModel( userData );
-            await user.save();
-            return user;
+            const item = await ReservationModel( data );
+            await item.save();
+            return item;
         } catch (error) {
-            throw new Error( "Error al crear un lodge..", error.message );
+            throw new Error( "Hubo un error en el servidor..", error.message );
         }
     }
 
     updateById = async(id, doc ) => {
         try {
             if ( !isValidId( id )) throw new Error("ID no válido..");
-            const lodge = await this.getById( id );
-            if ( !lodge ) throw new Error("Usuario no encontrado..");
+            const item = await this.getById( id );
+            if ( !item ) throw new Error("Item no encontrado..");
             return await ReservationModel.findByIdAndUpdate( id, { $set: doc }, { new: true });
         } catch ( error ) {
-            throw new Error("Error al actualizar un lodge por el id..", error.message);
+            throw new Error("Hubo un error en el servidor..", error.message);
         }
     };
 
     deleteById = async( id ) => {
         try {
             if ( !isValidId( id )) throw new Error("ID no válido..");
-            const user = await this.getById( id );
-            if ( !user ) return new Error("Usuario no encontrado..");
+            const item = await this.getById( id );
+            if ( !item ) return new Error("Usuario no encontrado..");
             return await ReservationModel.findOneAndDelete({ _id: id });
         } catch ( error ) {
-            throw new Error( "Error al eliminar un lodge por el id..", error.message );
+            throw new Error( "Hubo un error en el servidor..", error.message );
         }
     };
 
@@ -69,7 +69,7 @@ export default class ReservationsDao {
             await ReservationModel.deleteMany({});
             return await this.gets();
         } catch (error) {
-            throw new Error("Error al eliminar todos los lodges..", error.message);
+            throw new Error("Hubo un error en el servidor..", error.message);
         }
     };    
 };

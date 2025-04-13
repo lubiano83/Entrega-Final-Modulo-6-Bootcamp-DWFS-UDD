@@ -3,6 +3,7 @@ import usersRouter from "./routes/users.router.js";
 import sessionsRouter from "./routes/sessions.router.js";
 import seasonsRouter from "./routes/seasons.router.js";
 import lodgesRouter from "./routes/lodges.router.js";
+import reservationsRouter from "./routes/reservations.router.js";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
@@ -38,6 +39,7 @@ APP.use("/api/users", usersRouter);
 APP.use("/api/sessions", sessionsRouter);
 APP.use("/api/seasons", seasonsRouter);
 APP.use("/api/lodges", lodgesRouter);
+APP.use("/api/reservations", reservationsRouter);
 
 // Listening
 APP.listen(PORT, () => console.log(`Escuchando en http://${HOST}:${PORT}`));

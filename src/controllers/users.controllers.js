@@ -71,6 +71,10 @@ export default class UsersControllers {
             const { first_name, last_name, email, phone, password, address } = req.body;
             const { country, state, city, street, number } = address;
             if (!first_name || !last_name || !phone || !email || !password || !country || !state || !city || !street || !number) return res.status(400).json({ message: "Todos los campos son requeridos.." });
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) return res.status(400).send({ message: "Debes ingresar un email válido.." });
+            const phoneRegex = /^\+569\d{8}$/;
+            if (!phoneRegex.test(phone)) return res.status(400).send({ message: "Debes ingresar un telefono válido.." });
             const existingUser = await usersDao.getByProperty({ email: email.toLowerCase().trim() });
             if (existingUser.length > 0) return res.status(409).send({ message: "Ese email ya está registrado.." });
             if (String(password).trim().length < 6 || String(password).trim().length > 8) return res.status(409).send({ message: "La contraseña debe tener entre 6 y 8 caracteres.." });
