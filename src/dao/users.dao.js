@@ -7,7 +7,7 @@ export default class UsersDao {
         connectDB(); // Intentamos conectar a la base de datos
     }
 
-    getUsers = async() => {
+    gets = async() => {
         try {
             return await UserModel.find();
         } catch (error) {
@@ -15,7 +15,7 @@ export default class UsersDao {
         }
     };
 
-    getUserById = async( id ) => {
+    getById = async( id ) => {
         try {
             if (!isValidId(id)) throw new Error("ID no válido");
             return await UserModel.findOne({ _id: id });
@@ -24,7 +24,7 @@ export default class UsersDao {
         }
     }
 
-    getUserByProperty = async( doc ) => {
+    getByProperty = async( doc ) => {
         try {
             return await UserModel.find( doc );
         } catch (error) {
@@ -32,7 +32,7 @@ export default class UsersDao {
         }
     };
 
-    createUser = async( data ) => {
+    create = async( data ) => {
         try {
             const user = await UserModel( data );
             await user.save();
@@ -42,10 +42,10 @@ export default class UsersDao {
         }
     }
 
-    updateUserById = async( id, doc ) => {
+    updateById = async( id, doc ) => {
         try {
             if ( !isValidId( id )) throw new Error("ID no válido");
-            const user = await this.getUserById( id );
+            const user = await this.getById( id );
             if ( !user ) throw new Error("Usuario no encontrado");
             return await UserModel.findByIdAndUpdate( id, { $set: doc }, { new: true });
         } catch ( error ) {
@@ -53,10 +53,10 @@ export default class UsersDao {
         }
     };
 
-    deleteUserById = async( id ) => {
+    deleteById = async( id ) => {
         try {
             if ( !isValidId( id )) throw new Error("ID no válido");
-            const user = await this.getUserById( id );
+            const user = await this.getById( id );
             if ( !user ) return new Error("Usuario no encontrado");
             return await UserModel.findOneAndDelete({ _id: id });
         } catch ( error ) {
@@ -64,10 +64,10 @@ export default class UsersDao {
         }
     };
 
-    deleteAllUsers = async () => {
+    deleteAll = async () => {
         try {
             await UserModel.deleteMany({});
-            return await this.getUsers();
+            return await this.gets();
         } catch (error) {
             throw new Error("Error al eliminar todos los usuarios..", error.message);
         }

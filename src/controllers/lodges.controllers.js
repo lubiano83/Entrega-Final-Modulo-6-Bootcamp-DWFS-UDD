@@ -7,7 +7,7 @@ export default class LodgesControllers {
     getLodges = async(req, res) => {
         try {
             const { hotel, size, bedroom, bathroom, capacity, wifi, high, medium, low, available } = req.query;
-            const reservas = await lodgesDao.getLodges();
+            const reservas = await lodgesDao.gets();
             let filteredReservas = reservas;
             if (hotel) filteredReservas = filteredReservas.filter(item => item.hotel === hotel.toLowerCase().trim());
             if (size) filteredReservas = filteredReservas.filter(item => item.size === Number(size));
@@ -37,7 +37,7 @@ export default class LodgesControllers {
     getLodgeById = async(req, res) => {
         try {
             const { id } = req.params;
-            const lodge = await lodgesDao.getLodgesById(id);
+            const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
             return res.status(200).send({ message: "Lodge obtenido por el id..", payload: lodge });
         } catch (error) {
@@ -52,7 +52,7 @@ export default class LodgesControllers {
             if(!hotel || !size || !bedroom || !bathroom || !capacity || !high || !medium || !low) return res.status(400).send({ message: "Todos los campos son requeridos.." });
             const lodgeCreated = { hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), season: { high: Number(high), medium: Number(medium), low: Number(low) } };
             if(isNaN(Number(size)) || isNaN(Number(bedroom)) || isNaN(Number(bathroom)) || isNaN(Number(capacity)) || isNaN(Number(high)) || isNaN(Number(medium)) || isNaN(Number(low))) return res.status(400).send({ message: "El campo: size, bedrrom, bathrrom, capacity, high, medium, low, deben ser tipo numero.." });
-            await lodgesDao.createLodge(lodgeCreated);
+            await lodgesDao.create(lodgeCreated);
             return res.status(201).send({ message: "Lodge creado con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -62,12 +62,12 @@ export default class LodgesControllers {
     addImageToLodge = async(req, res) => {
         try {
             const { id } = req.params;
-            const lodge = await lodgesDao.getLodgesById(id);
+            const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
             const { image } = req.body;
             if(!image) return res.status(400).send({ message: "El campo image es requerido.." });
             lodge.image.push(image);
-            await lodgesDao.updateLodgeById(id, { image: lodge.image });
+            await lodgesDao.updateById(id, { image: lodge.image });
             return res.status(200).send({ message: "Imagen agregada con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -77,10 +77,10 @@ export default class LodgesControllers {
     deleteAllImageFromLodge = async(req, res) => {
         try {
             const { id } = req.params;
-            const lodge = await lodgesDao.getLodgesById(id);
+            const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
             lodge.image = [];
-            await lodgesDao.updateLodgeById(id, { image: lodge.image });
+            await lodgesDao.updateById(id, { image: lodge.image });
             return res.status(200).send({ message: "Imagenes eliminadas con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -90,7 +90,7 @@ export default class LodgesControllers {
     updateLogdeById = async(req, res) => {
         try {
             const { id } = req.params;
-            const lodge = await lodgesDao.getLodgesById(id);
+            const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
             const { hotel, size, bedroom, bathroom, capacity, wifi, season } = req.body;
             const { high, medium, low } = season;
@@ -99,7 +99,7 @@ export default class LodgesControllers {
             if(typeof updatedWifi !== "boolean") return res.status(400).send({ message: "El campo wifi debe ser true o false.." });
             const updatedLodge = { hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), wifi: updatedWifi, season: { high: Number(high), medium: Number(medium), low: Number(low) }};
             if(isNaN(Number(size)) || isNaN(Number(bedroom)) || isNaN(Number(bathroom)) || isNaN(Number(capacity)) || isNaN(Number(high)) || isNaN(Number(medium)) || isNaN(Number(low))) return res.status(400).send({ message: "El campo: size, bedrrom, bathrrom, capacity, high, medium, low, deben ser tipo numero.." });
-            await lodgesDao.updateLodgeById(id, updatedLodge);
+            await lodgesDao.updateById(id, updatedLodge);
             return res.status(200).send({ message: "Lodge actualizado con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -109,10 +109,10 @@ export default class LodgesControllers {
     changeAvailableById = async(req, res) => {
         try {
             const { id } = req.params;
-            const lodge = await lodgesDao.getLodgesById(id);
+            const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
             const changeAvailable = { available: !lodge.available };
-            await lodgesDao.updateLodgeById(id, changeAvailable);
+            await lodgesDao.updateById(id, changeAvailable);
             return res.status(200).send({ message: "Available cambiado con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -122,9 +122,9 @@ export default class LodgesControllers {
     deleteLodgeById = async(req, res) => {
         try {
             const { id } = req.params;
-            const lodge = await lodgesDao.getLodgesById(id);
+            const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
-            await lodgesDao.deleteLodgeById(id);
+            await lodgesDao.deleteById(id);
             return res.status(200).send({ message: "Lodge eliminado con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -133,7 +133,7 @@ export default class LodgesControllers {
 
     deleteAllLodges = async(req, res) => {
         try {
-            await lodgesDao.deleteAllLodges();
+            await lodgesDao.deleteAll();
             return res.status(200).send({ message: "Todos los lodges eliminados con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });

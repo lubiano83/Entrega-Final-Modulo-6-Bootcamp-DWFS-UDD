@@ -1,7 +1,7 @@
-import LodgeModel from "../models/lodges.models.js";
+import ReservationModel from "../models/reservations.models.js";
 import { connectDB, isValidId } from "../config/mongoose.config.js";
 
-export default class LodgesDao {
+export default class ReservationsDao {
 
     constructor() {
         connectDB(); // Intentamos conectar a la base de datos
@@ -9,7 +9,7 @@ export default class LodgesDao {
 
     gets = async() => {
         try {
-            return await LodgeModel.find();
+            return await ReservationModel.find();
         } catch (error) {
             throw new Error("Hubo un error al obtener los lodges..", error.message );
         }
@@ -18,7 +18,7 @@ export default class LodgesDao {
     getById = async( id ) => {
         try {
             if (!isValidId(id)) throw new Error("ID no válido");
-            return await LodgeModel.findOne({ _id: id });
+            return await ReservationModel.findOne({ _id: id });
         } catch (error) {
             throw new Error( "Error al obtener el lodge por el id..", error.message );
         }
@@ -26,7 +26,7 @@ export default class LodgesDao {
 
     getByProperty = async( doc ) => {
         try {
-            return await LodgeModel.find( doc );
+            return await ReservationModel.find( doc );
         } catch (error) {
             throw new Error( "Error al obtener el lodge por la propiedad..", error.message );
         }
@@ -34,7 +34,7 @@ export default class LodgesDao {
 
     create = async( userData ) => {
         try {
-            const user = await LodgeModel( userData );
+            const user = await ReservationModel( userData );
             await user.save();
             return user;
         } catch (error) {
@@ -47,7 +47,7 @@ export default class LodgesDao {
             if ( !isValidId( id )) throw new Error("ID no válido..");
             const lodge = await this.getById( id );
             if ( !lodge ) throw new Error("Usuario no encontrado..");
-            return await LodgeModel.findByIdAndUpdate( id, { $set: doc }, { new: true });
+            return await ReservationModel.findByIdAndUpdate( id, { $set: doc }, { new: true });
         } catch ( error ) {
             throw new Error("Error al actualizar un lodge por el id..", error.message);
         }
@@ -58,15 +58,15 @@ export default class LodgesDao {
             if ( !isValidId( id )) throw new Error("ID no válido..");
             const user = await this.getById( id );
             if ( !user ) return new Error("Usuario no encontrado..");
-            return await LodgeModel.findOneAndDelete({ _id: id });
+            return await ReservationModel.findOneAndDelete({ _id: id });
         } catch ( error ) {
             throw new Error( "Error al eliminar un lodge por el id..", error.message );
         }
     };
 
-    deleteAllLodges = async () => {
+    deleteAll = async () => {
         try {
-            await LodgeModel.deleteMany({});
+            await ReservationModel.deleteMany({});
             return await this.gets();
         } catch (error) {
             throw new Error("Error al eliminar todos los lodges..", error.message);

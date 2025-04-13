@@ -6,7 +6,7 @@ export default class SessionsDao {
         connectDB(); // Conecta a la base de datos
     }
 
-    getSessions = async () => {
+    gets = async () => {
         try {
             return await SessionModel.find();
         } catch ( error ) {
@@ -14,7 +14,7 @@ export default class SessionsDao {
         }
     };
 
-    createSession = async ( userId, token ) => {
+    create = async ( userId, token ) => {
         try {
             if ( !isValidId( userId )) throw new Error( "ID no válido" );
             if ( !token ) throw new Error( "El token es requerido" );
@@ -26,7 +26,7 @@ export default class SessionsDao {
         }
     };
 
-    getSessionByUserId = async( userId ) => {
+    getById = async( userId ) => {
         try {
             if ( !isValidId( userId )) throw new Error( "ID no válido" );
             const session = await SessionModel.findOne({ userId });
@@ -36,7 +36,7 @@ export default class SessionsDao {
         }
     }
 
-    deleteSession = async ( token ) => {
+    delete = async ( token ) => {
         try {
             if ( !token ) throw new Error( "El token es requerido" );
             const session = await SessionModel.findOneAndDelete({ token });
@@ -46,7 +46,7 @@ export default class SessionsDao {
         }
     };
 
-    getUserToken = async ( token ) => {
+    getToken = async ( token ) => {
         try {
             if ( !token ) throw new Error( "El token es requerido" );
             const user = await SessionModel.findOne({ token });
@@ -57,12 +57,12 @@ export default class SessionsDao {
         }
     };
 
-    deleteAllSessions = async () => {
-            try {
-                const result = await SessionModel.deleteMany({});
-                return await this.getSessions();
-            } catch (error) {
-                throw new Error("Error al eliminar todos los usuarios..", error.message);
-            }
-        };    
+    deleteAll = async () => {
+        try {
+            const result = await SessionModel.deleteMany({});
+            return await this.gets();
+        } catch (error) {
+            throw new Error("Error al eliminar todos los usuarios..", error.message);
+        }
+    };    
 }

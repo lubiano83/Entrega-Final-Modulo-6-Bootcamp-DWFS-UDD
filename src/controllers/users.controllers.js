@@ -13,7 +13,7 @@ export default class UsersControllers {
     getUsers = async(req, res) => {
         try {
             const { email, country, state, city, street, role, reservations, createdAt, sort } = req.query;
-            const users = await usersDao.getUsers();
+            const users = await usersDao.gets();
             let filteredUsers = users;
             if(email) filteredUsers = filteredUsers.filter(item => item.email === email.toLowerCase().trim());
             if(country) filteredUsers = filteredUsers.filter(item => item.address.country === country.toLowerCase().trim());
@@ -58,7 +58,7 @@ export default class UsersControllers {
     getUserById = async(req, res) => {
         try {
             const { id } = req.params;
-            const user = await usersDao.getUserById(id);
+            const user = await usersDao.getById(id);
             if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
             return res.status(200).send({ message: "Usuario obtenido por el id..", payload: user });
         } catch (error) {
@@ -71,12 +71,12 @@ export default class UsersControllers {
             const { first_name, last_name, email, phone, password, address } = req.body;
             const { country, state, city, street, number } = address;
             if (!first_name || !last_name || !phone || !email || !password || !country || !state || !city || !street || !number) return res.status(400).json({ message: "Todos los campos son requeridos.." });
-            const existingUser = await usersDao.getUserByProperty({ email: email.toLowerCase().trim() });
+            const existingUser = await usersDao.getByProperty({ email: email.toLowerCase().trim() });
             if (existingUser.length > 0) return res.status(409).send({ message: "Ese email ya está registrado.." });
             if (String(password).trim().length < 6 || String(password).trim().length > 8) return res.status(409).send({ message: "La contraseña debe tener entre 6 y 8 caracteres.." });
             const newUser = { first_name: first_name.toLowerCase().trim(), last_name: last_name.toLowerCase().trim(), phone: String(phone), email: email.toLowerCase().trim(), password: await createHash(String(password).trim()), address: { country: country.toLowerCase().trim(), state: state.toLowerCase().trim(), city: city.toLowerCase().trim(), street: street.toLowerCase().trim(), number: String(number).trim() }};
             if(isNaN(Number(number))) return res.status(400).send({ message: "El campo number debe ser tipo numero.." });
-            await usersDao.createUser(newUser);
+            await usersDao.create(newUser);
             return res.status(201).send({ message: "Usuario registrado con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -87,7 +87,7 @@ export default class UsersControllers {
         try {
             const { email, password } = req.body;
             if( !email || !password ) return res.status( 400 ).send({ message: "Todos los campos son requeridos.." });
-            const users = await usersDao.getUserByProperty({ email: email.toLowerCase().trim() });
+            const users = await usersDao.getByProperty({ email: email.toLowerCase().trim() });
             if( users.length === 0 ) return res.status( 404 ).send({ message: "Ese email no esta registrado.." });
             const passwordMatch = await isValidPassword(users[0], String(password).trim());
             if ( !passwordMatch ) return res.status( 401 ).send({ status: 401, message: "La contraseña es incorrecta.." });
@@ -95,7 +95,7 @@ export default class UsersControllers {
             if ( userLogged ) return res.status( 409 ).send({ message: "Ese usuario ya está logeado.." });
             const token = jwt.sign({ email: users[0].email.toLowerCase(), first_name: users[0].first_name.toLowerCase(), last_name: users[0].last_name.toLowerCase(), phone: users[0].phone, role: users[0].role.toLowerCase(), id: users[0]._id.toString() }, process.env.COOKIE_KEY, { expiresIn: "1h" });
             res.cookie( process.env.COOKIE_NAME, token, { maxAge: 3600000, httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "none", path: "/" });
-            await sessionsDao.createSession(users[0]._id, token);
+            await sessionsDao.create(users[0]._id, token);
             return res.status( 200 ).send({ message: "Login realizado con éxito", token });
         } catch ( error ) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -107,7 +107,7 @@ export default class UsersControllers {
             const token = req.cookies[process.env.COOKIE_NAME];
             if (!token) return res.status(401).send({ message: "Token no encontrado, sesión cerrada.." });
             res.clearCookie(process.env.COOKIE_NAME, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "none", path: "/" });
-            await sessionsDao.deleteSession(token);
+            await sessionsDao.delete(token);
             return res.status(200).send({ message: "Logout realizado con éxito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -117,14 +117,14 @@ export default class UsersControllers {
     updateUserById = async (req, res) => {
         try {
             const { id } = req.params;
-            const user = await usersDao.getUserById(id);
+            const user = await usersDao.getById(id);
             if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
             const { first_name, last_name, phone, address } = req.body;
             const { country, state, city, street, number } = address;
             if( !first_name || !last_name || !phone || !country || !state || !city || !street || !number ) return res.status(400).send({ message: "Todos los campos son requeridos.." });
             const updatedUser = { first_name: first_name.toLowerCase().trim(), last_name: last_name.toLowerCase().trim(), address: { country: country.toLowerCase().trim(), state: state.toLowerCase().trim(), city: city.toLowerCase().trim(), street: street.toLowerCase().trim(), number: String(number).trim() }};
             if(isNaN(Number(number))) return res.status(400).send({ message: "El campo number debe ser tipo numero.." });
-            await usersDao.updateUserById(id, updatedUser);
+            await usersDao.updateById(id, updatedUser);
             return res.status(200).send({ message: "Usuario actualizado con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -134,7 +134,7 @@ export default class UsersControllers {
     changeImageById = async(req, res) => {
         try {
             const { id } = req.params;
-            const user = await usersDao.getUserById(id);
+            const user = await usersDao.getById(id);
             if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
             if (!req.file) return res.status(400).send({ message: "No se ha subido ninguna imagen.." });
             const baseUrl = `${req.protocol}://${req.get("host")}`;
@@ -145,7 +145,7 @@ export default class UsersControllers {
                 if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
             };
             const changedImage = { image: `${baseUrl}/${req.file.filename}` };
-            await usersDao.updateUserById(id, changedImage);
+            await usersDao.updateById(id, changedImage);
             return res.status(200).send({ message: "Imagen cambiada con éxito." });
         } catch (error) {
             return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
@@ -156,13 +156,13 @@ export default class UsersControllers {
         try {
             const { id } = req.params;
             const { role } = req.body;
-            const user = await usersDao.getUserById(id);
+            const user = await usersDao.getById(id);
             if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
             const newRole = role.toLowerCase().trim();
             const validRoles = ["user", "admin", "developer"];
             if (!validRoles.includes(newRole)) return res.status(400).send({ message: "Ese role no está habilitado.." });
             const modifiedRole = { role: newRole.toLowerCase().trim() };
-            await usersDao.updateUserById(id, modifiedRole);
+            await usersDao.updateById(id, modifiedRole);
             return res.status(200).send({ message: "Role actualizado con exito.." });
         } catch (error) {
             return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
@@ -172,7 +172,7 @@ export default class UsersControllers {
     deleteUserById = async(req, res) => {
         try {
             const { id } = req.params;
-            const user = await usersDao.getUserById(id);
+            const user = await usersDao.getById(id);
             if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
             if (user.image && !user.image.includes("user-circle-svgrepo-com.svg")) {
                 let filename = user.image;
@@ -180,7 +180,7 @@ export default class UsersControllers {
                 const imagePath = path.join(process.cwd(), "src/public/profile", filename);
                 if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
             };
-            await usersDao.deleteUserById(id);
+            await usersDao.deleteById(id);
             return res.status(200).send({ message: "Usuario eliminado con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -189,7 +189,7 @@ export default class UsersControllers {
 
     deleteAllUsers = async(req, res) => {
         try {
-            const users = await usersDao.getUsers();
+            const users = await usersDao.gets();
             users.forEach(user => {
                 if (user.image && !user.image.includes("user-circle-svgrepo-com.svg")) {
                     let filename = user.image;
@@ -198,7 +198,7 @@ export default class UsersControllers {
                     if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
                 }
             });
-            await usersDao.deleteAllUsers();
+            await usersDao.deleteAll();
             return res.status(200).send({ message: "Todos los usuarios eliminados con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -207,7 +207,7 @@ export default class UsersControllers {
 
     usersRegistered = async( req, res ) => {
         try {
-            const users = await usersDao.getUsers();
+            const users = await usersDao.gets();
             const usersRegistered = users.length;
             return res.status( 200 ).send({ payload: usersRegistered });
         } catch ( error ) {
@@ -217,7 +217,7 @@ export default class UsersControllers {
 
     usersLogged = async( req, res ) => {
         try {
-            const users = await sessionsDao.getSessions();
+            const users = await sessionsDao.gets();
             const usersOnline = users.length;
             return res.status( 200 ).send({ payload: usersOnline });
         } catch ( error ) {

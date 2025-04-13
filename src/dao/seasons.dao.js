@@ -7,7 +7,7 @@ export default class SeasonsDao {
         connectDB(); // Intentamos conectar a la base de datos
     }
 
-    getSeasons = async() => {
+    gets = async() => {
         try {
             return await SeasonModel.find();
         } catch (error) {
@@ -15,7 +15,7 @@ export default class SeasonsDao {
         }
     };
 
-    createSeason = async( data ) => {
+    create = async( data ) => {
         try {
             const season = await SeasonModel( data );
             await season.save();
@@ -25,10 +25,10 @@ export default class SeasonsDao {
         }
     }
 
-    deleteAllSeasons = async () => {
+    deleteAll = async () => {
         try {
             const result = await SeasonModel.deleteMany({});
-            return await this.getSeasons();
+            return await this.gets();
         } catch (error) {
             throw new Error("Error al eliminar todos los usuarios..", error.message);
         }
