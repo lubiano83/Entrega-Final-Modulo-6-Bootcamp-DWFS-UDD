@@ -50,7 +50,7 @@ export default class ReservationsController {
         try {
             const reservationsList = await reservationsDao.gets();
             if(reservationsList.length === 0) return false;
-            const existingReservations = reservationsList.filter(item => String(item.lodge) === lodgeId);
+            const existingReservations = reservationsList.filter(item => String(item.lodge._id) === lodgeId);
             const conflict = existingReservations.some(reservation => {
                 const reservationStart = new Date(reservation.arrive);
                 const reservationEnd = new Date(reservation.leave);
@@ -104,7 +104,8 @@ export default class ReservationsController {
             if (conflict) return res.status(400).send({ message: "Esta cabaña ya está reservada en las fechas seleccionadas.." });
             const emailResponse = await sendReservationEmail(modifiedData);
             if (!emailResponse.success) return res.status(500).send({ message: "Reserva creada, pero hubo un error al enviar el email.", error: emailResponse.error });
-            await reservationsDao.create(modifiedData);
+            const reservation = await reservationsDao.create(modifiedData);
+            await usersDao.updateById(userId, {$push: { reservations: reservation._id }});
             return res.status(201).send({ message: "Reserva creada con éxito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -132,6 +133,9 @@ export default class ReservationsController {
             const { id } = req.params;
             const reservation = await reservationsDao.getById(id);
             if(!reservation) return res.status(404).send({ message: "Esa reserva no existe.." });
+            const user = await usersDao.getById(reservation.user);
+            const newArray = user.reservations.filter(item => String(item._id) !== id);
+            await usersDao.updateById(reservation.user, { reservations: newArray });
             await reservationsDao.deleteById(id);
             return res.status(200).send({ message: "Reserva eliminada con exito.." });
         } catch (error) {

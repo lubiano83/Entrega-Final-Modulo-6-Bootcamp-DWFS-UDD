@@ -38,10 +38,5 @@ const reservationSchema = new mongoose.Schema({
 
 reservationSchema.plugin(paginate);
 
-reservationSchema.pre(/^find/, function (next) {
-    this.populate("user").populate("lodge");
-    next();
-});
-
 const ReservationModel = mongoose.models[collection] || mongoose.model(collection, reservationSchema);
 export default ReservationModel;

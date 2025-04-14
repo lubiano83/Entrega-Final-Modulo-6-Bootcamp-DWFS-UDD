@@ -10,50 +10,44 @@ const sessionsDao = new SessionsDao();
 
 export default class UsersControllers {
 
-    getUsers = async(req, res) => {
+    getUsers = async (req, res) => {
         try {
-            const { email, country, state, city, street, role, reservations, createdAt, sort } = req.query;
-            const users = await usersDao.gets();
-            let filteredUsers = users;
-            if(email) filteredUsers = filteredUsers.filter(item => item.email === email.toLowerCase().trim());
-            if(country) filteredUsers = filteredUsers.filter(item => item.address.country === country.toLowerCase().trim());
-            if(state) filteredUsers = filteredUsers.filter(item => item.address.state === state.toLowerCase().trim());
-            if(city) filteredUsers = filteredUsers.filter(item => item.address.city === city.toLowerCase().trim());
-            if(street) filteredUsers = filteredUsers.filter(item => item.address.street === street.toLowerCase().trim());
-            if(role) filteredUsers = filteredUsers.filter(item => item.role === role.toLowerCase().trim());
-            if (createdAt) filteredUsers = filteredUsers.filter(item => item.createdAt === createdAt.toLowerCase().trim());
+            const { email, country, state, city, street, role, reservations, createdAt, sort, page = 1, limit = 10 } = req.query;
+            const filters = {};
+            if (email) filters.email = email.toLowerCase().trim();
+            if (role) filters.role = role.toLowerCase().trim();
+            if (country) filters["address.country"] = country.toLowerCase().trim();
+            if (state) filters["address.state"] = state.toLowerCase().trim();
+            if (city) filters["address.city"] = city.toLowerCase().trim();
+            if (street) filters["address.street"] = street.toLowerCase().trim();
+            if (createdAt) filters.createdAt = new Date(createdAt);
 
+            const result = await usersDao.paginate(filters, { page: parseInt(page), limit: parseInt(limit) });
+            let users = result.docs;
+    
             if (reservations) {
-                let sortOrder = reservations.toLowerCase().trim();
+                const sortOrder = reservations.toLowerCase().trim();
                 if (sortOrder === 'asc') {
-                    filteredUsers.sort((a, b) => b.reservations.length - a.reservations.length);
+                    users.sort((a, b) => b.reservations.length - a.reservations.length);
                 } else if (sortOrder === 'desc') {
-                    filteredUsers.sort((a, b) => a.reservations.length - b.reservations.length);
-                }
-            };
-
-            if (sort) {
-                let sortOrder = sort.toLowerCase().trim();
-                if (sortOrder === 'asc') {
-                    filteredUsers.sort((a, b) => {
-                        const dateA = new Date(a.createdAt.split('/').reverse().join('-'));
-                        const dateB = new Date(b.createdAt.split('/').reverse().join('-'));
-                        return dateA - dateB;
-                    });
-                } else if (sortOrder === 'desc') {
-                    filteredUsers.sort((a, b) => {
-                        const dateA = new Date(a.createdAt.split('/').reverse().join('-'));
-                        const dateB = new Date(b.createdAt.split('/').reverse().join('-'));
-                        return dateB - dateA;
-                    });
+                    users.sort((a, b) => a.reservations.length - b.reservations.length);
                 }
             }
-
-            return res.status(200).send({ message: "Todos los usuarios..", payload: filteredUsers });
+    
+            if (sort) {
+                const sortOrder = sort.toLowerCase().trim();
+                if (sortOrder === 'asc') {
+                    users.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+                } else if (sortOrder === 'desc') {
+                    users.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                }
+            }
+    
+            return res.status(200).send({ message: "Todos los usuarios..", payload: users, page: result.page, limit: result.limit, total: result.totalDocs, totalPages: result.totalPages });
         } catch (error) {
-            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+            return res.status(500).send({ message: "Error al obtener usuarios desde el servidor..", error: error.message });
         }
-    };
+    };    
 
     getUserById = async(req, res) => {
         try {

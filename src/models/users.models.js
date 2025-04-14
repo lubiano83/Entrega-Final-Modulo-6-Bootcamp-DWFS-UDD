@@ -47,10 +47,12 @@ const userSchema = new mongoose.Schema({
         enum: [ "user", "admin", "developer" ],
         default: "user"
     },
-    reservations: {
-        type: Array,
-        default: []
-    },
+    reservations: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "reservations"
+        }
+    ],
     createdAt: {
         type: Date,
         default: Date.now,

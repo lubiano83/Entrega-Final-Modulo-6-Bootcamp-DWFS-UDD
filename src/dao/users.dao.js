@@ -7,6 +7,14 @@ export default class UsersDao {
         connectDB(); // Intentamos conectar a la base de datos
     }
 
+    paginate = async (filters = {}, options = {}) => {
+        try {
+            return await UserModel.paginate(filters, options);
+        } catch (error) {
+            throw new Error("Hubo un error al paginar los usuarios..", error.message);
+        }
+    };
+
     gets = async() => {
         try {
             return await UserModel.find();
@@ -42,16 +50,16 @@ export default class UsersDao {
         }
     }
 
-    updateById = async( id, doc ) => {
+    updateById = async (id, doc) => {
         try {
-            if ( !isValidId( id )) throw new Error("ID no válido");
-            const user = await this.getById( id );
-            if ( !user ) throw new Error("Usuario no encontrado");
-            return await UserModel.findByIdAndUpdate( id, { $set: doc }, { new: true });
-        } catch ( error ) {
-            throw new Error("Error al actualizar un usuario por el id..", error.message);
+            if (!isValidId(id)) throw new Error("ID no válido");
+            const user = await this.getById(id);
+            if (!user) throw new Error("Usuario no encontrado");
+            return await UserModel.findByIdAndUpdate(id, doc, { new: true });
+        } catch (error) {
+            throw new Error("Error al actualizar un usuario por el id.. " + error.message);
         }
-    };
+    };    
 
     deleteById = async( id ) => {
         try {
