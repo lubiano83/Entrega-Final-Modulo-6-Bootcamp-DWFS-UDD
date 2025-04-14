@@ -11,7 +11,7 @@ export default class ReservationsDao {
         try {
             return await ReservationModel.paginate(filters, options);
         } catch (error) {
-            throw new Error("Hubo un error al paginar los usuarios..", error.message);
+            throw new Error( "Hubo un error en el servidor..", error.message );
         }
     };
 
@@ -25,7 +25,7 @@ export default class ReservationsDao {
 
     getById = async( id ) => {
         try {
-            if (!isValidId(id)) throw new Error("ID no válido");
+            if (!isValidId(id)) throw new Error("ID no válido..");
             return await ReservationModel.findOne({ _id: id });
         } catch (error) {
             throw new Error( "Hubo un error en el servidor..", error.message );
@@ -65,7 +65,7 @@ export default class ReservationsDao {
         try {
             if ( !isValidId( id )) throw new Error("ID no válido..");
             const item = await this.getById( id );
-            if ( !item ) return new Error("Usuario no encontrado..");
+            if ( !item ) return new Error("No encontrado..");
             return await ReservationModel.findOneAndDelete({ _id: id });
         } catch ( error ) {
             throw new Error( "Hubo un error en el servidor..", error.message );

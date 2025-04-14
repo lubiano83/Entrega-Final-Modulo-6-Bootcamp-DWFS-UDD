@@ -11,26 +11,26 @@ export default class SeasonsDao {
         try {
             return await SeasonModel.find();
         } catch (error) {
-            throw new Error("Hubo un error al obtener los usuarios..", error.message );
+            throw new Error( "Hubo un error en el servidor..", error.message );
         }
     };
 
     create = async( data ) => {
         try {
-            const season = await SeasonModel( data );
-            await season.save();
-            return season;
+            const item = await SeasonModel( data );
+            await item.save();
+            return item;
         } catch (error) {
-            throw new Error( "Error al crear un usuario..", error.message );
+            throw new Error( "Hubo un error en el servidor..", error.message );
         }
     }
 
     deleteAll = async () => {
         try {
-            const result = await SeasonModel.deleteMany({});
+            await SeasonModel.deleteMany({});
             return await this.gets();
         } catch (error) {
-            throw new Error("Error al eliminar todos los usuarios..", error.message);
+            throw new Error( "Hubo un error en el servidor..", error.message );
         }
     };    
 };

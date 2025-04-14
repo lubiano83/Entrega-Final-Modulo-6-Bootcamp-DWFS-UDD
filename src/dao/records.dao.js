@@ -11,7 +11,7 @@ export default class RecordsDao {
         try {
             return await RecordModel.paginate(filters, options);
         } catch (error) {
-            throw new Error("Hubo un error al paginar los usuarios..", error.message);
+            throw new Error( "Hubo un error en el servidor..", error.message );
         }
     };
 
