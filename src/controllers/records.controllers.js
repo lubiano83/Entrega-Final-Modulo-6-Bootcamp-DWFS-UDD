@@ -6,12 +6,15 @@ export default class RecordsControllers {
 
     getRecords = async(req, res) => {
         try {
-            const { lodge, user, people, arrive, leave, price } = req.query;
-            let records = await recordsDao.gets();
-            if(lodge) records = records.filter(item => String(item.lodge) === lodge);
-            if(user) records = records.filter(item => String(item.user) === user);
-            if(people) records = records.filter(item => item.people === Number(people));
-            if(price) records = records.filter(item => item.price === Number(price));
+            const { lodge, user, people, arrive, leave, price, page = 1, limit = 10 } = req.query;
+            const filters = {};
+            if(lodge) filters.lodge = lodge;
+            if(user) filters.user = user;
+            if(people) filters.people = Number(people);
+            if(price) filters.price = Number(price);
+            
+            const result = await recordsDao.paginate(filters, { page: parseInt(page), limit: parseInt(limit) });
+            let records = result.docs;
 
             if (arrive === "asc" || arrive === "desc") {
                 records.sort((a, b) => {
@@ -29,7 +32,7 @@ export default class RecordsControllers {
                 });
             };
 
-            return res.status(200).send({ message: "Todos los registros..", payload: records });
+            return res.status(200).send({ message: "Todos los registros..", payload: records, page: result.page, limit: result.limit, total: result.totalDocs, totalPages: result.totalPages });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }

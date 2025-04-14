@@ -68,8 +68,33 @@ export default class ReservationsController {
 
     getReservations = async(req, res) => {
         try {
-            const reservations = await reservationsDao.gets();
-            return res.status(200).send({ message: "Todas las reservas..", payload: reservations });
+            const { lodge, user, people, arrive, leave, price, page = 1, limit = 10 } = req.query;
+            const filters = {};
+            if(lodge) filters.lodge = lodge;
+            if(user) filters.user = user;
+            if(people) filters.people = Number(people);
+            if(price) filters.price = Number(price);
+
+            const result = await reservationsDao.paginate(filters, { page: parseInt(page), limit: parseInt(limit) });
+            let reservations = result.docs;
+
+            if (arrive === "asc" || arrive === "desc") {
+                reservations.sort((a, b) => {
+                    const dateA = new Date(a.arrive);
+                    const dateB = new Date(b.arrive);
+                    return arrive === "asc" ? dateA - dateB : dateB - dateA;
+                });
+            };
+
+            if (leave === "asc" || leave === "desc") {
+                reservations.sort((a, b) => {
+                    const dateA = new Date(a.leave);
+                    const dateB = new Date(b.leave);
+                    return leave === "asc" ? dateA - dateB : dateB - dateA;
+                });
+            };
+            
+            return res.status(200).send({ message: "Todas las reservas..", payload: reservations,  page: result.page, limit: result.limit, total: result.totalDocs, totalPages: result.totalPages });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }

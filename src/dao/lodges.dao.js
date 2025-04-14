@@ -7,6 +7,14 @@ export default class LodgesDao {
         connectDB(); // Intentamos conectar a la base de datos
     }
 
+    paginate = async (filters = {}, options = {}) => {
+        try {
+            return await LodgeModel.paginate(filters, options);
+        } catch (error) {
+            throw new Error("Hubo un error al paginar los usuarios..", error.message);
+        }
+    };
+
     gets = async() => {
         try {
             return await LodgeModel.find();

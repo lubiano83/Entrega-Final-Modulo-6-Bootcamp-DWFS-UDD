@@ -6,29 +6,31 @@ export default class LodgesControllers {
 
     getLodges = async(req, res) => {
         try {
-            const { hotel, size, bedroom, bathroom, capacity, wifi, high, medium, low, available } = req.query;
-            const reservas = await lodgesDao.gets();
-            let filteredReservas = reservas;
-            if (hotel) filteredReservas = filteredReservas.filter(item => item.hotel === hotel.toLowerCase().trim());
-            if (size) filteredReservas = filteredReservas.filter(item => item.size === Number(size));
-            if (bedroom) filteredReservas = filteredReservas.filter(item => item.bedroom === Number(bedroom));
-            if (bathroom) filteredReservas = filteredReservas.filter(item => item.bathroom === Number(bathroom));
-            if (capacity) filteredReservas = filteredReservas.filter(item => item.capacity === Number(capacity));
-            if (high) filteredReservas = filteredReservas.filter(item => item.season.high === Number(high));
-            if (medium) filteredReservas = filteredReservas.filter(item => item.season.medium === Number(medium));
-            if (low) filteredReservas = filteredReservas.filter(item => item.season.low === Number(low));
+            const { hotel, size, bedroom, bathroom, capacity, wifi, high, medium, low, available, page = 1, limit = 10 } = req.query;
+            const filters = {};
+            if (hotel) filters.hotel = hotel;
+            if (size) filters.size = Number(size);
+            if (bedroom) filters.bedroom = Number(bedroom);
+            if (bathroom) filters.bathroom = Number(bathroom);
+            if (capacity) filters.capacity = Number(capacity);
+            if (high) filters["season.high"] = Number(high);
+            if (medium) filters["season.high.medium"] = Number(medium);
+            if (low) filters["season.high.low"] = Number(low);
+            
+            const result = await lodgesDao.paginate(filters, { page: parseInt(page), limit: parseInt(limit) });
+            let lodges = result.docs;
 
             if (wifi !== undefined) {
-                const wifiBool = wifi.toLowerCase() === "true";
-                filteredReservas = filteredReservas.filter(item => item.wifi === wifiBool);
+                const wifiBool = wifi.toLowerCase().trim() === "true";
+                lodges = lodges.filter(item => item.wifi === wifiBool);
             }
             
             if (available !== undefined) {
-                const availableBool = available.toLowerCase() === "true";
-                filteredReservas = filteredReservas.filter(item => item.available === availableBool);
+                const availableBool = available.toLowerCase().trim() === "true";
+                lodges = lodges.filter(item => item.available === availableBool);
             }
 
-            return res.status(200).send({ message: "Todos los Lodges..", payload: filteredReservas });
+            return res.status(200).send({ message: "Todos los Lodges..", payload: lodges, page: result.page, limit: result.limit, total: result.totalDocs, totalPages: result.totalPages });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
