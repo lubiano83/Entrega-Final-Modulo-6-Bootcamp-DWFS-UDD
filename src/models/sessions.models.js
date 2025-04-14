@@ -21,13 +21,5 @@ const sessionSchema = new mongoose.Schema({
     },
 });
 
-sessionSchema.pre(/^find/, function (next) {
-    this.populate({
-        path: "userId", // Popula `detail` dentro de `products`
-        model: "users",
-    });
-    next();
-});
-
 const SessionModel = mongoose.models[collection] || mongoose.model(collection, sessionSchema);
 export default SessionModel;
