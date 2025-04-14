@@ -94,7 +94,7 @@ export default class ReservationsController {
                 });
             };
             
-            return res.status(200).send({ message: "Todas las reservas..", payload: reservations,  page: result.page, limit: result.limit, total: result.totalDocs, totalPages: result.totalPages });
+            return res.status(200).send({ message: "Todas las reservas..", payload: reservations, items: result.totalDocs, limit: result.limit, page: result.page, totalPages: result.totalPages });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }

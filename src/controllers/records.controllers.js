@@ -32,7 +32,9 @@ export default class RecordsControllers {
                 });
             };
 
-            return res.status(200).send({ message: "Todos los registros..", payload: records, page: result.page, limit: result.limit, total: result.totalDocs, totalPages: result.totalPages });
+            const totalSales = records.reduce((sum, record) => sum + record.price, 0);
+
+            return res.status(200).send({ message: "Todos los registros..", payload: records, items: result.totalDocs, total: totalSales, limit: result.limit, page: result.page, totalPages: result.totalPages });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }

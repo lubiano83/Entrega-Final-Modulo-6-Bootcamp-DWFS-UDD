@@ -30,7 +30,7 @@ export default class LodgesControllers {
                 lodges = lodges.filter(item => item.available === availableBool);
             }
 
-            return res.status(200).send({ message: "Todos los Lodges..", payload: lodges, page: result.page, limit: result.limit, total: result.totalDocs, totalPages: result.totalPages });
+            return res.status(200).send({ message: "Todos los Lodges..", payload: lodges, items: result.totalDocs, limit: result.limit, page: result.page, totalPages: result.totalPages });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
