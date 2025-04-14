@@ -38,5 +38,10 @@ const recordSchema = new mongoose.Schema({
 
 recordSchema.plugin(paginate);
 
+recordSchema.pre(/^find/, function (next) {
+    this.populate("lodge").populate("user");
+    next();
+});
+
 const RecordModel = mongoose.models[collection] || mongoose.model(collection, recordSchema);
 export default RecordModel;

@@ -153,7 +153,7 @@ export default class ReservationsController {
             const { id } = req.params;
             const reservation = await reservationsDao.getById(id);
             if(!reservation) return res.status(404).send({ message: "Esa reserva no existe.." });
-            const recordData = { lodge: String(reservation.lodge), user: String(reservation.user), people: Number(reservation.people), arrive: new Date(reservation.arrive), leave: new Date(reservation.leave), price: Number(reservation.price), paid: !reservation.paid };
+            const recordData = { lodge: reservation.lodge, user: reservation.user, people: Number(reservation.people), arrive: new Date(reservation.arrive), leave: new Date(reservation.leave), price: Number(reservation.price), paid: !reservation.paid };
             await recordsDao.create(recordData);
             await reservationsDao.deleteById(id);
             return res.status(201).send({ message: "Reserva pagada con exito.." });
