@@ -126,7 +126,7 @@ export default class UsersControllers {
             const { first_name, last_name, phone, address } = req.body;
             const { country, state, city, street, number } = address;
             if( !first_name || !last_name || !phone || !country || !state || !city || !street || !number ) return res.status(400).send({ message: "Todos los campos son requeridos.." });
-            const updatedUser = { first_name: first_name.toLowerCase().trim(), last_name: last_name.toLowerCase().trim(), address: { country: country.toLowerCase().trim(), state: state.toLowerCase().trim(), city: city.toLowerCase().trim(), street: street.toLowerCase().trim(), number: String(number).trim() }};
+            const updatedUser = { first_name: first_name.toLowerCase().trim(), last_name: last_name.toLowerCase().trim(), address: { country: country.toLowerCase().trim(), state: state.toLowerCase().trim(), city: city.toLowerCase().trim(), street: street.toLowerCase().trim(), number: String(number).trim() }, updatedAt: new Date()};
             if(isNaN(Number(number))) return res.status(400).send({ message: "El campo number debe ser tipo numero.." });
             await usersDao.updateById(id, updatedUser);
             return res.status(200).send({ message: "Usuario actualizado con exito.." });

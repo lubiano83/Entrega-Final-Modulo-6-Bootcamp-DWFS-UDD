@@ -24,7 +24,7 @@ const recordSchema = new mongoose.Schema({
     leave: {
         type: Date,
         required: true,
-        trim: true
+        trim: true,
     },
     price: {
         type: Number,

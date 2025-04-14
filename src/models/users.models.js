@@ -54,25 +54,11 @@ const userSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now,
-        get: (value) => moment(value).format("DD/MM/YYYY")
     },
     updatedAt: {
         type: Date,
         default: Date.now,
-        get: (value) => moment(value).format("DD/MM/YYYY")
     }
-});
-
-// Hook pre-save para actualizar 'updatedAt'
-userSchema.pre("save", function (next) {
-    this.updatedAt = Date.now();
-    next();
-});
-
-// Hook pre-update para actualizar 'updatedAt' en operaciones findOneAndUpdate
-userSchema.pre("findOneAndUpdate", function (next) {
-    this._update.updatedAt = Date.now();
-    next();
 });
 
 userSchema.plugin(paginate);

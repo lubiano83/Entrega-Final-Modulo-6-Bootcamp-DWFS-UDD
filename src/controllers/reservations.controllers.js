@@ -4,7 +4,6 @@ import LodgesDao from "../dao/lodges.dao.js";
 import ReservationsDao from "../dao/reservations.dao.js";
 import RecordsDao from "../dao/records.dao.js";
 import { sendReservationEmail } from "../utils/nodemailer.utils.js";
-import moment from "moment";
 
 const usersDao = new UsersDao();
 const seasonsDao = new SeasonsDao();
@@ -118,7 +117,7 @@ export default class ReservationsController {
             const reservation = await reservationsDao.getById(id);
             if(!reservation) return res.status(404).send({ message: "Esa reserva no existe.." });
             const { lodge, people, arrive, leave } = req.body;
-            const updatedReservation = { lodge: String(lodge), people: Number(people), arrive: moment(arrive, "DD/MM/YYYY"), leave: moment(leave, "DD/MM/YYYY") };
+            const updatedReservation = { lodge: String(lodge), people: Number(people), arrive: new Date(arrive), leave: new Date(leave) };
             const conflict = await this.#confirmReservationDate(updatedReservation, updatedReservation.lodge);
             if (conflict) return res.status(400).send({ message: "Esta cabaña ya está reservada en las fechas seleccionadas.." });
             await reservationsDao.updateById(id, updatedReservation);
@@ -154,8 +153,7 @@ export default class ReservationsController {
             const { id } = req.params;
             const reservation = await reservationsDao.getById(id);
             if(!reservation) return res.status(404).send({ message: "Esa reserva no existe.." });
-            await reservationsDao.updateById(id, { paid: !reservation.paid });
-            const recordData = { lodge: String(reservation.lodge), user: String(reservation.user), people: Number(reservation.people), arrive: moment(reservation.arrive, "DD/MM/YYYY"), leave: moment(reservation.leave, "DD/MM/YYYY"), price: Number(reservation.price), paid: reservation.paid };
+            const recordData = { lodge: String(reservation.lodge), user: String(reservation.user), people: Number(reservation.people), arrive: new Date(reservation.arrive), leave: new Date(reservation.leave), price: Number(reservation.price), paid: !reservation.paid };
             await recordsDao.create(recordData);
             await reservationsDao.deleteById(id);
             return res.status(201).send({ message: "Reserva pagada con exito.." });
