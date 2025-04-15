@@ -1,7 +1,7 @@
 openapi: "3.0.3"
 info:
-  title: "Documentación de la App de Reservas de Cabañas - Lodges"
-  description: "API para la administración de las cabañas (lodges)."
+  title: "Documentación de la App de Reservas de Cabañas - Cabañas"
+  description: "API para la administración y consulta de cabañas disponibles para hospedaje."
   version: "1.0.0"
 
 servers:

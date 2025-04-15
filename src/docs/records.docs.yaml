@@ -1,0 +1,92 @@
+openapi: "3.0.3"
+info:
+  title: "Documentación de la App de Reservas de Cabañas - Cabañas"
+  description: "API para la administración y consulta de cabañas disponibles para hospedaje."
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/records:
+    get:
+      summary: Obtener registros con filtros
+      description: Retorna una lista paginada de registros con filtros opcionales y el total de ventas.
+      tags:
+        - Records
+      parameters:
+        - in: query
+          name: lodge
+          schema: { type: string }
+        - in: query
+          name: user
+          schema: { type: string }
+        - in: query
+          name: people
+          schema: { type: number }
+        - in: query
+          name: price
+          schema: { type: number }
+        - in: query
+          name: arrive
+          schema: { type: string, enum: [asc, desc] }
+        - in: query
+          name: leave
+          schema: { type: string, enum: [asc, desc] }
+        - in: query
+          name: page
+          schema: { type: number, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: number, default: 10 }
+      responses:
+        '200':
+          description: Lista de registros obtenida exitosamente.
+        '500':
+          description: Error al obtener datos desde el servidor.
+
+    delete:
+      summary: Eliminar todos los registros
+      description: Borra todos los registros existentes en el sistema.
+      tags:
+        - Records
+      responses:
+        '200':
+          description: Todos los registros eliminados exitosamente.
+        '500':
+          description: Error al obtener datos desde el servidor.
+
+  /api/records/{id}:
+    get:
+      summary: Obtener registro por ID
+      tags:
+        - Records
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Registro encontrado por ID.
+        '404':
+          description: Registro no encontrado.
+        '500':
+          description: Error al obtener datos desde el servidor.
+
+    delete:
+      summary: Eliminar registro por ID
+      tags:
+        - Records
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Registro eliminado exitosamente.
+        '404':
+          description: Registro no encontrado.
+        '500':
+          description: Error al obtener datos desde el servidor.
