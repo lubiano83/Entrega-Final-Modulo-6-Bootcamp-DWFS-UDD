@@ -17,6 +17,8 @@ Este es un sistema de reservas de cabañas desarrollado con Node.js y Express.js
 - Express.js
 - Swagger UI
 - Nodemailer
+- Firebase
+- Passport (JWT)
 
 ⚙️ Configuración
 
