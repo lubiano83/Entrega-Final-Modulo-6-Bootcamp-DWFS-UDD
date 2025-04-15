@@ -1,46 +1,29 @@
 import multer from "multer";
 import sharp from "sharp";
-import fs from "fs";
-import path from "path";
 
-// Configurar Multer para almacenar archivos temporalmente
-const profileStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadPath = path.join(process.cwd(), "src/public/profile");
-    if (!fs.existsSync(uploadPath)) fs.mkdirSync(uploadPath, { recursive: true });
-    cb(null, uploadPath);
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
+// Multer en modo memoria (no guarda en disco)
+const uploadProfile = multer({ storage: multer.memoryStorage() });
 
-const uploadProfile = multer({ storage: profileStorage });
-
-// Middleware para convertir imágenes a .webp
+// Middleware para convertir imágenes a .webp en memoria
 const convertToWebp = async (req, res, next) => {
   if (!req.file) return next(); // Si no hay imagen, continuar
 
-  const inputPath = req.file.path; // Ruta original de la imagen
-  const uploadDir = path.dirname(inputPath); // Directorio donde se guardará la imagen
-  const outputFilename = `${Date.now()}-converted.webp`; // Nombre único para la imagen .webp
-  const outputPath = path.join(uploadDir, outputFilename); // Nueva ruta de salida
-
   try {
-    await sharp(inputPath)
-      .webp({ quality: 80 }) // Convertir a webp con calidad 80
-      .toFile(outputPath);
+    const convertedBuffer = await sharp(req.file.buffer)
+      .webp({ quality: 80 }) // Convertir a webp
+      .toBuffer();
 
-    fs.unlinkSync(inputPath); // Elimina la imagen original
+    // Reemplaza el buffer original por el nuevo convertido
+    req.file.buffer = convertedBuffer;
 
-    // Actualiza el nombre del archivo en `req.file`
-    req.file.filename = outputFilename;
-    req.file.path = outputPath;
+    // Actualiza el nombre de archivo (opcional, pero útil)
+    const originalName = req.file.originalname.split(".")[0];
+    req.file.originalname = `${originalName}.webp`;
 
     next();
   } catch (error) {
     console.error("Error al convertir la imagen a .webp:", error);
-    next(error);
+    return res.status(500).send({ message: "Error al procesar la imagen." });
   }
 };
 

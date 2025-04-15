@@ -1,6 +1,7 @@
 import UsersDao from "../dao/users.dao.js";
 import SessionsDao from "../dao/sessions.dao.js";
 import { createHash, isValidPassword } from "../utils/bcrypt.utils.js";
+import { bucket } from "../config/firebase.config.js";
 import jwt from "jsonwebtoken";
 import fs from "fs";
 import path from "path";
@@ -129,26 +130,50 @@ export default class UsersControllers {
         }
     };
 
-    changeImageById = async(req, res) => {
-        try {
-            const { id } = req.params;
-            const user = await usersDao.getById(id);
-            if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
-            if (!req.file) return res.status(400).send({ message: "No se ha subido ninguna imagen.." });
-            const baseUrl = `${req.protocol}://${req.get("host")}`;
-            let oldFilename = user.image;
-            if (oldFilename && oldFilename.startsWith("http")) oldFilename = oldFilename.split("/").pop();
-            if (oldFilename && oldFilename !== "user-circle-svgrepo-com.svg") {
-                const oldImagePath = path.join(process.cwd(), "src/public/profile", oldFilename);
-                if (fs.existsSync(oldImagePath)) fs.unlinkSync(oldImagePath);
-            };
-            const changedImage = { image: `${baseUrl}/${req.file.filename}` };
+    changeImageById = async (req, res) => {
+      try {
+        const { id } = req.params;
+        const user = await usersDao.getById(id);
+        if (!user) return res.status(404).send({ message: "Ese usuario no existe.." });
+        if (!req.file) return res.status(400).send({ message: "No se ha subido ninguna imagen.." });
+        if (user.image && user.image.includes("storage.googleapis.com")){
+            try {
+              const imageUrl = new URL(user.image);
+              const pathInBucket = imageUrl.pathname.replace(`/${bucket.name}/`, "");
+              const oldFile = bucket.file(pathInBucket);
+              await oldFile.delete().catch(() => {});
+            } catch (err) {
+              console.warn("No se pudo eliminar la imagen anterior:", err.message);
+            }
+        };          
+
+        const fileName = `profile/${Date.now()}-${req.file.originalname}`;
+        const file = bucket.file(fileName);
+        const stream = file.createWriteStream({
+            metadata: {
+                contentType: "image/webp",
+            },
+        });
+    
+        stream.end(req.file.buffer);
+        stream.on("error", (err) => {
+            console.error("Error al subir la imagen:", err);
+            return res.status(500).send({ message: "Error al subir imagen a Firebase.", error: err.message });
+        });
+    
+        stream.on("finish", async () => {
+            await file.makePublic();
+            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
+            const changedImage = { image: publicUrl };
             await usersDao.updateById(id, changedImage);
-            return res.status(200).send({ message: "Imagen cambiada con éxito." });
+            return res.status(200).send({ message: "Imagen cambiada con éxito.", imageUrl: publicUrl });
+        });
+    
         } catch (error) {
-            return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
     };
+    
 
     changeRoleById = async(req, res) => {
         try {
