@@ -213,25 +213,25 @@ export default class UsersControllers {
           
     deleteAllUsers = async (req, res) => {
         try {
-          const users = await usersDao.gets();
-      
-          for (const user of users) {
-            if (user.image && user.image.includes("storage.googleapis.com") && !user.image.includes("user-circle-svgrepo-com.svg")) {
-              try {
-                const imageUrl = new URL(user.image);
-                const pathInBucket = imageUrl.pathname.replace(`/${bucket.name}/`, "");
-                const file = bucket.file(pathInBucket);
-                await file.delete();
-              } catch (err) {
-                console.warn("No se pudo eliminar la imagen de Firebase Storage:", err.message);
-              }
+            const users = await usersDao.gets();
+        
+            for (const user of users) {
+                if (user.image && user.image.includes("storage.googleapis.com") && !user.image.includes("user-circle-svgrepo-com.svg")) {
+                try {
+                    const imageUrl = new URL(user.image);
+                    const pathInBucket = imageUrl.pathname.replace(`/${bucket.name}/`, "");
+                    const file = bucket.file(pathInBucket);
+                    await file.delete();
+                } catch (err) {
+                    console.warn("No se pudo eliminar la imagen de Firebase Storage:", err.message);
+                }
+                }
             }
-          }
-      
-          await usersDao.deleteAll();
-          return res.status(200).send({ message: "Todos los usuarios eliminados con éxito." });
+        
+            await usersDao.deleteAll();
+            return res.status(200).send({ message: "Todos los usuarios eliminados con éxito." });
         } catch (error) {
-          return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
+            return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
         }
     };
 

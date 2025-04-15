@@ -10,6 +10,8 @@ paths:
     get:
       summary: "Obtener lista de usuarios"
       description: "Recupera la lista de usuarios aplicando filtros y paginación."
+      tags: 
+        - Users
       parameters:
         - in: query
           name: email
@@ -99,6 +101,8 @@ paths:
     get:
       summary: "Obtener usuario por ID"
       description: "Recupera la información de un usuario a partir de su ID."
+      tags: 
+        - Users
       parameters:
         - in: path
           name: id
@@ -125,6 +129,8 @@ paths:
     put:
       summary: "Actualizar usuario por ID"
       description: "Actualiza la información de un usuario especificado por su ID."
+      tags: 
+        - Users
       parameters:
         - in: path
           name: id
@@ -194,6 +200,8 @@ paths:
     delete:
       summary: "Eliminar usuario por ID"
       description: "Elimina un usuario a partir de su ID."
+      tags: 
+        - Users
       parameters:
         - in: path
           name: id
@@ -212,6 +220,8 @@ paths:
     patch:
       summary: "Cambiar imagen de perfil del usuario"
       description: "Actualiza la imagen de perfil de un usuario. Se espera el envío de un archivo (form-data)."
+      tags: 
+        - Users
       parameters:
         - in: path
           name: id
@@ -252,6 +262,8 @@ paths:
     patch:
       summary: "Cambiar rol del usuario"
       description: "Actualiza el rol de un usuario. Los roles válidos son 'user', 'admin' y 'developer'."
+      tags: 
+        - Users
       parameters:
         - in: path
           name: id
@@ -285,6 +297,8 @@ paths:
     delete:
       summary: "Eliminar todos los usuarios"
       description: "Elimina todos los usuarios de la base de datos."
+      tags: 
+        - Users
       responses:
         '200':
           description: "Todos los usuarios eliminados con éxito."

@@ -1,0 +1,175 @@
+openapi: "3.0.3"
+info:
+  title: "Documentación de la API de Sesiones y Registro de Usuarios"
+  description: "API para la administración de sesiones y registro de usuarios en la App de Reservas de Cabañas."
+  version: "1.0.0"
+servers:
+  - url: http://localhost:8080/api/sessions
+paths:
+  /api/sessions/registered:
+    get:
+      summary: "Obtener cantidad de usuarios registrados"
+      description: "Retorna el número total de usuarios registrados en la plataforma."
+      tags: 
+        - Sessions
+      responses:
+        '200':
+          description: "Número de usuarios registrados obtenido exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload:
+                    type: integer
+                    example: 100
+        '500':
+          description: "Error interno del servidor."
+  /api/sessions/logged:
+    get:
+      summary: "Obtener cantidad de usuarios logueados"
+      description: "Retorna el número total de usuarios con sesión activa en la plataforma."
+      tags: 
+        - Sessions
+      responses:
+        '200':
+          description: "Número de usuarios logueados obtenido exitosamente."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload:
+                    type: integer
+                    example: 10
+        '500':
+          description: "Error interno del servidor."
+  /api/sessions/register:
+    post:
+      summary: "Registrar un nuevo usuario"
+      description: "Crea un nuevo usuario con los datos proporcionados."
+      tags: 
+        - Sessions
+      requestBody:
+        description: "Datos requeridos para el registro de un usuario."
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - first_name
+                - last_name
+                - email
+                - phone
+                - password
+                - address
+              properties:
+                first_name:
+                  type: string
+                  default: "Juan"
+                last_name:
+                  type: string
+                  default: "Pérez"
+                email:
+                  type: string
+                  format: email
+                  default: "juan.perez@example.com"
+                phone:
+                  type: string
+                  default: "+56912345678"
+                password:
+                  type: string
+                  default: "123456"
+                address:
+                  type: object
+                  required:
+                    - country
+                    - state
+                    - city
+                    - street
+                    - number
+                  properties:
+                    country:
+                      type: string
+                      default: "Chile"
+                    state:
+                      type: string
+                      default: "Santiago"
+                    city:
+                      type: string
+                      default: "Santiago"
+                    street:
+                      type: string
+                      default: "Av. Siempre Viva"
+                    number:
+                      type: string
+                      default: "123"
+      responses:
+        '201':
+          description: "Usuario registrado con éxito."
+        '400':
+          description: "Solicitud incorrecta, faltan campos o formato inválido."
+        '409':
+          description: "Conflicto en el registro (email existente o contraseña inválida)."
+        '500':
+          description: "Error interno del servidor."
+  /api/sessions/login:
+    post:
+      summary: "Autenticar usuario (Login)"
+      description: "Inicia sesión para un usuario registrado utilizando email y password."
+      tags:
+        - Sessions
+      requestBody:
+        description: "Credenciales del usuario."
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                  default: "juan.perez@example.com"
+                password:
+                  type: string
+                  default: "123456"
+      responses:
+        '200':
+          description: "Login realizado con éxito."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login realizado con éxito"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '400':
+          description: "Solicitud incorrecta, faltan campos."
+        '401':
+          description: "Contraseña incorrecta."
+        '404':
+          description: "Email no registrado."
+        '500':
+          description: "Error interno del servidor."
+  /api/sessions/logout:
+    post:
+      summary: "Cerrar sesión (Logout)"
+      description: "Finaliza la sesión del usuario y elimina la cookie de autenticación."
+      tags: 
+        - Sessions
+      responses:
+        '200':
+          description: "Logout realizado con éxito."
+        '401':
+          description: "Token no encontrado."
+        '500':
+          description: "Error interno del servidor."
