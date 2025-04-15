@@ -159,7 +159,7 @@ export default class ReservationsController {
             const reservation = await reservationsDao.getById(id);
             if(!reservation) return res.status(404).send({ message: "Esa reserva no existe.." });
             const user = await usersDao.getById(reservation.user);
-            const newArray = user.reservations.filter(item => String(item._id) !== id);
+            const newArray = user.reservations.filter(item => item !== id);
             await usersDao.updateById(reservation.user, { reservations: newArray });
             await reservationsDao.deleteById(id);
             return res.status(200).send({ message: "Reserva eliminada con exito.." });

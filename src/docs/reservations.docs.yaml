@@ -1,0 +1,174 @@
+openapi: "3.0.3"
+info:
+  title: "Documentación de la App de Reservas de Cabañas - Reservas"
+  description: "API para la gestión de reservas de cabañas."
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/reservations:
+    get:
+      summary: Obtener reservas con filtros
+      description: Retorna una lista paginada de reservas con filtros opcionales.
+      tags:
+        - Reservations
+      parameters:
+        - in: query
+          name: lodge
+          schema: { type: string }
+        - in: query
+          name: user
+          schema: { type: string }
+        - in: query
+          name: people
+          schema: { type: number }
+        - in: query
+          name: price
+          schema: { type: number }
+        - in: query
+          name: arrive
+          schema: { type: string, enum: [asc, desc] }
+        - in: query
+          name: leave
+          schema: { type: string, enum: [asc, desc] }
+        - in: query
+          name: page
+          schema: { type: number, default: 1 }
+        - in: query
+          name: limit
+          schema: { type: number, default: 10 }
+      responses:
+        '200':
+          description: Lista de reservas obtenida.
+        '500':
+          description: Error del servidor.
+
+    delete:
+      summary: Eliminar todas las reservas
+      tags:
+        - Reservations
+      responses:
+        '200':
+          description: Todas las reservas eliminadas.
+        '500':
+          description: Error del servidor.
+
+  /api/reservations/{id}:
+    get:
+      summary: Obtener reserva por ID
+      tags:
+        - Reservations
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Reserva encontrada.
+        '404':
+          description: Reserva no existe.
+        '500':
+          description: Error del servidor.
+
+    delete:
+      summary: Eliminar reserva por ID
+      tags:
+        - Reservations
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Reserva eliminada.
+        '404':
+          description: Reserva no existe.
+        '500':
+          description: Error del servidor.
+
+    put:
+      summary: Actualizar reserva por ID
+      tags:
+        - Reservations
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [lodge, people, arrive, leave]
+              properties:
+                lodge: { type: string, default: "662eff0ee55bd228e85ad553" }
+                people: { type: number, default: 4 }
+                arrive: { type: string, format: date, default: "2025-12-10" }
+                leave: { type: string, format: date, default: "2025-12-15" }
+      responses:
+        '200':
+          description: Reserva actualizada.
+        '400':
+          description: Conflicto de fechas o datos inválidos.
+        '404':
+          description: Reserva no existe.
+        '500':
+          description: Error del servidor.
+
+    patch:
+      summary: Marcar reserva como pagada y mover a registros
+      tags:
+        - Reservations
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '201':
+          description: Reserva pagada y archivada.
+        '404':
+          description: Reserva no existe.
+        '500':
+          description: Error del servidor.
+
+  /api/reservations/{lodgeId}/{userId}:
+    post:
+      summary: Crear nueva reserva
+      tags:
+        - Reservations
+      parameters:
+        - in: path
+          name: lodgeId
+          required: true
+          schema: { type: string }
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [people, arrive, leave]
+              properties:
+                people: { type: number, example: 4 }
+                arrive: { type: string, format: date, example: "2025-12-10" }
+                leave: { type: string, format: date, example: "2025-12-15" }
+      responses:
+        '201':
+          description: Reserva creada con éxito.
+        '400':
+          description: Error en datos, capacidad o conflicto de fechas.
+        '404':
+          description: Usuario o cabaña no encontrado.
+        '500':
+          description: Error del servidor.
