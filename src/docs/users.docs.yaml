@@ -1,82 +1,79 @@
 openapi: "3.0.3"
 info:
-  title: API de Usuarios
+  title: "Documentación de la App de Reservas de Cabañas - Cabañas"
+  description: "API para la administración y consulta de cabañas disponibles para hospedaje."
   version: "1.0.0"
-  description: >
-    Documentación de la API para la gestión de usuarios y sesiones.
-    Incluye endpoints para obtener, actualizar, eliminar usuarios, gestionar la imagen,
-    cambiar roles, registrar, loguear y cerrar sesión.
 servers:
   - url: http://localhost:8080/api/users
 paths:
-  /:
+  /api/users:
     get:
-      summary: Obtener lista de usuarios
-      description: Recupera una lista de usuarios aplicando filtros y paginación.
+      summary: "Obtener lista de usuarios"
+      description: "Recupera la lista de usuarios aplicando filtros y paginación."
       parameters:
         - in: query
           name: email
           schema:
             type: string
-          description: Email del usuario (convertido a minúsculas y recortado).
+          description: "Email del usuario (convertido a minúsculas y recortado)."
         - in: query
           name: country
           schema:
             type: string
-          description: País de la dirección del usuario.
+          description: "País de la dirección del usuario."
         - in: query
           name: state
           schema:
             type: string
-          description: Estado de la dirección del usuario.
+          description: "Estado de la dirección del usuario."
         - in: query
           name: city
           schema:
             type: string
-          description: Ciudad de la dirección del usuario.
+          description: "Ciudad de la dirección del usuario."
         - in: query
           name: street
           schema:
             type: string
-          description: Calle de la dirección del usuario.
+          description: "Calle de la dirección del usuario."
         - in: query
           name: role
           schema:
             type: string
-          description: Rol del usuario.
+          description: "Rol del usuario."
         - in: query
           name: reservations
           schema:
             type: string
             enum: [asc, desc]
-          description: Orden para la cantidad de reservaciones.
+          description: "Orden para la cantidad de reservaciones."
         - in: query
           name: createdAt
           schema:
             type: string
             format: date-time
-          description: Fecha de creación para filtrar usuarios.
+          description: "Fecha de creación para filtrar usuarios."
         - in: query
           name: sort
           schema:
             type: string
             enum: [asc, desc]
-          description: Orden para la fecha de creación.
+          description: "Orden para la fecha de creación."
         - in: query
           name: page
           schema:
             type: integer
             default: 1
-          description: Número de página para la paginación.
+          description: "Número de página para la paginación."
         - in: query
           name: limit
           schema:
             type: integer
             default: 10
-          description: Límite de resultados por página.
+          description: "Límite de resultados por página."
       responses:
         '200':
-          description: Lista de usuarios obtenida exitosamente.
+          description: "Lista de usuarios obtenida exitosamente."
           content:
             application/json:
               schema:
@@ -97,21 +94,21 @@ paths:
                   totalPages:
                     type: integer
         '500':
-          description: Error interno del servidor.
-  /{id}:
+          description: "Error interno del servidor."
+  /api/users/{id}:
     get:
-      summary: Obtener usuario por ID
-      description: Recupera la información de un usuario a partir de su ID.
+      summary: "Obtener usuario por ID"
+      description: "Recupera la información de un usuario a partir de su ID."
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: Identificador único del usuario.
+          description: "Identificador único del usuario."
       responses:
         '200':
-          description: Usuario obtenido exitosamente.
+          description: "Usuario obtenido exitosamente."
           content:
             application/json:
               schema:
@@ -122,21 +119,21 @@ paths:
                   payload:
                     $ref: '#/components/schemas/User'
         '404':
-          description: Usuario no encontrado.
+          description: "Usuario no encontrado."
         '500':
-          description: Error interno del servidor.
+          description: "Error interno del servidor."
     put:
-      summary: Actualizar usuario por ID
-      description: Actualiza la información de un usuario especificado por su ID.
+      summary: "Actualizar usuario por ID"
+      description: "Actualiza la información de un usuario especificado por su ID."
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: Identificador único del usuario.
+          description: "Identificador único del usuario."
       requestBody:
-        description: Datos para actualizar el usuario.
+        description: "Datos para actualizar el usuario."
         required: true
         content:
           application/json:
@@ -150,10 +147,13 @@ paths:
               properties:
                 first_name:
                   type: string
+                  default: "Juan"
                 last_name:
                   type: string
+                  default: "Pérez"
                 phone:
                   type: string
+                  default: "+56912345678"
                 address:
                   type: object
                   required:
@@ -165,56 +165,62 @@ paths:
                   properties:
                     country:
                       type: string
+                      default: "Chile"
                     state:
                       type: string
+                      default: "Santiago"
                     city:
                       type: string
+                      default: "Santiago"
                     street:
                       type: string
+                      default: "Av. Siempre Viva"
                     number:
                       type: string
+                      default: "123"
                 updatedAt:
                   type: string
                   format: date-time
+                  default: "2023-01-01T00:00:00.000Z"
       responses:
         '200':
-          description: Usuario actualizado con éxito.
+          description: "Usuario actualizado con éxito."
         '400':
-          description: Solicitud incorrecta (faltan campos o formato inválido).
+          description: "Solicitud incorrecta (faltan campos o formato inválido)."
         '404':
-          description: Usuario no encontrado.
+          description: "Usuario no encontrado."
         '500':
-          description: Error interno del servidor.
+          description: "Error interno del servidor."
     delete:
-      summary: Eliminar usuario por ID
-      description: Elimina un usuario a partir de su ID.
+      summary: "Eliminar usuario por ID"
+      description: "Elimina un usuario a partir de su ID."
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: Identificador único del usuario.
+          description: "Identificador único del usuario."
       responses:
         '200':
-          description: Usuario eliminado con éxito.
+          description: "Usuario eliminado con éxito."
         '404':
-          description: Usuario no encontrado.
+          description: "Usuario no encontrado."
         '500':
-          description: Error interno del servidor.
-  /image/{id}:
+          description: "Error interno del servidor."
+  /api/users/image/{id}:
     patch:
-      summary: Cambiar imagen de perfil del usuario
-      description: Actualiza la imagen de perfil de un usuario. Se espera el envío de un archivo (form-data).
+      summary: "Cambiar imagen de perfil del usuario"
+      description: "Actualiza la imagen de perfil de un usuario. Se espera el envío de un archivo (form-data)."
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: Identificador único del usuario.
+          description: "Identificador único del usuario."
       requestBody:
-        description: Se debe enviar un archivo de imagen.
+        description: "Archivo de imagen a subir."
         required: true
         content:
           multipart/form-data:
@@ -226,7 +232,7 @@ paths:
                   format: binary
       responses:
         '200':
-          description: Imagen actualizada con éxito.
+          description: "Imagen actualizada con éxito."
           content:
             application/json:
               schema:
@@ -237,24 +243,24 @@ paths:
                   imageUrl:
                     type: string
         '400':
-          description: Solicitud incorrecta, imagen no enviada.
+          description: "Solicitud incorrecta, imagen no enviada."
         '404':
-          description: Usuario no encontrado.
+          description: "Usuario no encontrado."
         '500':
-          description: Error interno del servidor.
-  /role/{id}:
+          description: "Error interno del servidor."
+  /api/users/role/{id}:
     patch:
-      summary: Cambiar rol del usuario
-      description: Actualiza el rol de un usuario. Los roles válidos son "user", "admin" y "developer".
+      summary: "Cambiar rol del usuario"
+      description: "Actualiza el rol de un usuario. Los roles válidos son 'user', 'admin' y 'developer'."
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
-          description: Identificador único del usuario.
+          description: "Identificador único del usuario."
       requestBody:
-        description: Objeto JSON con el nuevo rol.
+        description: "Objeto JSON con el nuevo rol."
         required: true
         content:
           application/json:
@@ -268,163 +274,22 @@ paths:
                   enum: [user, admin, developer]
       responses:
         '200':
-          description: Rol actualizado con éxito.
+          description: "Rol actualizado con éxito."
         '400':
-          description: Solicitud incorrecta o rol inválido.
+          description: "Solicitud incorrecta o rol inválido."
         '404':
-          description: Usuario no encontrado.
+          description: "Usuario no encontrado."
         '500':
-          description: Error interno del servidor.
-  /delete/all:
+          description: "Error interno del servidor."
+  /api/users/delete/all:
     delete:
-      summary: Eliminar todos los usuarios
-      description: Elimina a todos los usuarios de la base de datos.
+      summary: "Eliminar todos los usuarios"
+      description: "Elimina todos los usuarios de la base de datos."
       responses:
         '200':
-          description: Todos los usuarios eliminados con éxito.
+          description: "Todos los usuarios eliminados con éxito."
         '500':
-          description: Error interno del servidor.
-  /registered:
-    get:
-      summary: Obtener cantidad de usuarios registrados
-      description: Retorna el número total de usuarios registrados.
-      responses:
-        '200':
-          description: Número de usuarios registrados obtenido exitosamente.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  payload:
-                    type: integer
-        '500':
-          description: Error interno del servidor.
-  /logged:
-    get:
-      summary: Obtener cantidad de usuarios logueados
-      description: Retorna el número total de usuarios con sesión activa.
-      responses:
-        '200':
-          description: Número de usuarios logueados obtenido exitosamente.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  payload:
-                    type: integer
-        '500':
-          description: Error interno del servidor.
-  /register:
-    post:
-      summary: Registrar un nuevo usuario
-      description: Crea un usuario con los datos proporcionados.
-      requestBody:
-        description: Datos requeridos para el registro del usuario.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - first_name
-                - last_name
-                - email
-                - phone
-                - password
-                - address
-              properties:
-                first_name:
-                  type: string
-                last_name:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                phone:
-                  type: string
-                password:
-                  type: string
-                address:
-                  type: object
-                  required:
-                    - country
-                    - state
-                    - city
-                    - street
-                    - number
-                  properties:
-                    country:
-                      type: string
-                    state:
-                      type: string
-                    city:
-                      type: string
-                    street:
-                      type: string
-                    number:
-                      type: string
-      responses:
-        '201':
-          description: Usuario registrado con éxito.
-        '400':
-          description: Solicitud incorrecta, faltan campos o formato inválido.
-        '409':
-          description: Conflicto en el registro (email existente o contraseña inválida).
-        '500':
-          description: Error interno del servidor.
-  /login:
-    post:
-      summary: Autenticar usuario (Login)
-      description: Inicia sesión para un usuario registrado utilizando email y password.
-      requestBody:
-        description: Credenciales del usuario.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - email
-                - password
-              properties:
-                email:
-                  type: string
-                  format: email
-                password:
-                  type: string
-      responses:
-        '200':
-          description: Login realizado con éxito.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  token:
-                    type: string
-        '400':
-          description: Solicitud incorrecta, faltan campos.
-        '401':
-          description: Contraseña incorrecta.
-        '404':
-          description: Email no registrado.
-        '500':
-          description: Error interno del servidor.
-  /logout:
-    post:
-      summary: Cerrar sesión (Logout)
-      description: Finaliza la sesión del usuario y elimina la cookie de autenticación.
-      responses:
-        '200':
-          description: Logout realizado con éxito.
-        '401':
-          description: Token no encontrado.
-        '500':
-          description: Error interno del servidor.
+          description: "Error interno del servidor."
 components:
   schemas:
     User:

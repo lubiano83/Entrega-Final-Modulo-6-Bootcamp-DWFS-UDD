@@ -171,7 +171,6 @@ export default class UsersControllers {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
     };
-    
 
     changeRoleById = async(req, res) => {
         try {
@@ -190,39 +189,49 @@ export default class UsersControllers {
         }
     }; 
 
-    deleteUserById = async(req, res) => {
+    deleteUserById = async (req, res) => {
         try {
             const { id } = req.params;
             const user = await usersDao.getById(id);
-            if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
-            if (user.image && !user.image.includes("user-circle-svgrepo-com.svg")) {
-                let filename = user.image;
-                if (filename.startsWith("http")) filename = filename.split("/").pop();
-                const imagePath = path.join(process.cwd(), "src/public/profile", filename);
-                if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+            if (!user) return res.status(404).send({ message: "Ese usuario no existe.." });
+            if (user.image && user.image.includes("storage.googleapis.com") && !user.image.includes("user-circle-svgrepo-com.svg")) {
+                try {
+                    const imageUrl = new URL(user.image);
+                    const pathInBucket = imageUrl.pathname.replace(`/${bucket.name}/`, "");
+                    const file = bucket.file(pathInBucket);
+                    await file.delete();
+                } catch (err) {
+                    console.warn("No se pudo eliminar la imagen de Firebase Storage:", err.message);
+                }
             };
             await usersDao.deleteById(id);
-            return res.status(200).send({ message: "Usuario eliminado con exito.." });
+            return res.status(200).send({ message: "Usuario eliminado con éxito.." });
         } catch (error) {
-            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+          return res.status(500).send({ message: "Error al eliminar el usuario.", error: error.message });
         }
     };
-
-    deleteAllUsers = async(req, res) => {
+          
+    deleteAllUsers = async (req, res) => {
         try {
-            const users = await usersDao.gets();
-            users.forEach(user => {
-                if (user.image && !user.image.includes("user-circle-svgrepo-com.svg")) {
-                    let filename = user.image;
-                    if (filename.startsWith("http")) filename = filename.split("/").pop();
-                    const imagePath = path.join(process.cwd(), "src/public/profile", filename);
-                    if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-                }
-            });
-            await usersDao.deleteAll();
-            return res.status(200).send({ message: "Todos los usuarios eliminados con exito.." });
+          const users = await usersDao.gets();
+      
+          for (const user of users) {
+            if (user.image && user.image.includes("storage.googleapis.com") && !user.image.includes("user-circle-svgrepo-com.svg")) {
+              try {
+                const imageUrl = new URL(user.image);
+                const pathInBucket = imageUrl.pathname.replace(`/${bucket.name}/`, "");
+                const file = bucket.file(pathInBucket);
+                await file.delete();
+              } catch (err) {
+                console.warn("No se pudo eliminar la imagen de Firebase Storage:", err.message);
+              }
+            }
+          }
+      
+          await usersDao.deleteAll();
+          return res.status(200).send({ message: "Todos los usuarios eliminados con éxito." });
         } catch (error) {
-            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+          return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
         }
     };
 
