@@ -41,7 +41,7 @@ APP.use("/", express.static(path.join(process.cwd(), "src/public")));
 APP.use("/profile", express.static(path.join(process.cwd(), "src/public/profile")));
 
 // Rutas
-APP.get("/", (req, res) => res.send("Servidor funcionando con Express!!"));
+APP.get("/", (req, res) => res.send(`<h1>Este es nuestro backend de un sistema de reservas!!</h1><br/>  <a href="/api/docs" target="_blank"><button>Swagger</button></a>`));
 APP.use("/api/users", usersRouter);
 APP.use("/api/sessions", sessionsRouter);
 APP.use("/api/seasons", seasonsRouter);
