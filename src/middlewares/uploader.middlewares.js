@@ -22,7 +22,6 @@ const convertToWebp = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.error("Error al convertir la imagen a .webp:", error);
     return res.status(500).send({ message: "Error al procesar la imagen." });
   }
 };
