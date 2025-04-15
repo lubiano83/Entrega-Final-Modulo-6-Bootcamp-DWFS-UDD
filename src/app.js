@@ -10,7 +10,6 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 import dotenv from "dotenv";
-import { fileURLToPath } from "url";
 import path from "path";
 
 // Variables
@@ -18,10 +17,6 @@ dotenv.config();
 const APP = express();
 const PORT = 8080;
 const HOST = "localhost";
-
-// Define manualmente __dirname
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 // Middlewares
 APP.use(express.json());
