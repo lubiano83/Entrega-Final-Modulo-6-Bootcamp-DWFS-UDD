@@ -1,0 +1,99 @@
+openapi: "3.0.3"
+info:
+  title: "Documentación de la App de Reservas de Cabañas - Temporadas"
+  description: "API para la administración y consulta de temporadas del sistema."
+  version: "1.0.0"
+
+servers:
+  - url: http://localhost:8080
+
+paths:
+  /api/seasons:
+    get:
+      summary: Obtener temporadas
+      description: Retorna todas las temporadas definidas en el sistema.
+      tags:
+        - Seasons
+      responses:
+        '200':
+          description: Lista de temporadas obtenida con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Todas las temporadas..
+                  payload:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        highSeasonStart:
+                          type: string
+                          format: date
+                          example: "2025/12/01"
+                        highSeasonEnd:
+                          type: string
+                          format: date
+                          example: "2026/02/29"
+                        midSeasonStart:
+                          type: string
+                          format: date
+                          example: "2025/09/01"
+                        midSeasonEnd:
+                          type: string
+                          format: date
+                          example: "2025/11/30"
+        '500':
+          description: Error al obtener los datos desde el servidor.
+
+    post:
+      summary: Crear nueva temporada
+      description: Crea una nueva configuración de temporada. Este endpoint reemplaza todas las temporadas existentes.
+      tags:
+        - Seasons
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - highSeasonStart
+                - highSeasonEnd
+                - midSeasonStart
+                - midSeasonEnd
+              properties:
+                highSeasonStart:
+                  type: string
+                  format: date
+                  example: "2025/12/01"
+                highSeasonEnd:
+                  type: string
+                  format: date
+                  example: "2026/02/29"
+                midSeasonStart:
+                  type: string
+                  format: date
+                  example: "2025/09/01"
+                midSeasonEnd:
+                  type: string
+                  format: date
+                  example: "2025/11/30"
+      responses:
+        '201':
+          description: Temporada creada con éxito.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Temporada creada con exito..
+        '400':
+          description: Faltan campos obligatorios.
+        '500':
+          description: Error interno del servidor.

@@ -30,6 +30,15 @@ APP.use(cookieParser());
 APP.use(passport.initialize());
 initializePassport();
 
+// 🔐 Middleware para bloquear acceso en producción (debe ir *después* de rutas y Swagger)
+APP.use((req, res, next) => {
+    const isProduction = process.env.NODE_ENV === "production";
+    const allowSwagger = req.originalUrl.startsWith("/api/docs");
+    const allowStatic = req.originalUrl.startsWith("/profile") || req.originalUrl === "/";
+    if (isProduction && !allowSwagger && !allowStatic) return res.status(403).json({ message: "Acceso a la API no permitido en producción." });
+    next();
+});  
+
 // Servir imágenes desde la carpeta public
 APP.use("/", express.static(path.join(process.cwd(), "src/public")));
 
@@ -37,14 +46,16 @@ APP.use("/", express.static(path.join(process.cwd(), "src/public")));
 APP.use("/profile", express.static(path.join(process.cwd(), "src/public/profile")));
 
 // Rutas
+APP.get("/", (req, res) => res.send("Servidor funcionando con Express!!"));
 APP.use("/api/users", usersRouter);
 APP.use("/api/sessions", sessionsRouter);
 APP.use("/api/seasons", seasonsRouter);
 APP.use("/api/lodges", lodgesRouter);
 APP.use("/api/reservations", reservationsRouter);
 APP.use("/api/records", recordsRouter);
-APP.use("/api/docs", swaggerServe, swaggerSetup);
 
+// Swagger
+APP.use("/api/docs", swaggerServe, swaggerSetup);
 
 // Método que gestiona las rutas inexistentes.
 APP.use((req, res) => {

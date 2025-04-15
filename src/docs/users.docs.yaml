@@ -3,8 +3,10 @@ info:
   title: "Documentación de la App de Reservas de Cabañas - Cabañas"
   description: "API para la administración y consulta de cabañas disponibles para hospedaje."
   version: "1.0.0"
+
 servers:
   - url: http://localhost:8080/api/users
+  
 paths:
   /api/users:
     get:
