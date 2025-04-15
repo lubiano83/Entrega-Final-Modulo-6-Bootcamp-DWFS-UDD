@@ -29,7 +29,8 @@ initializePassport();
 APP.use((req, res, next) => {
     const isProduction = process.env.NODE_ENV === "production";
     const allowSwagger = req.originalUrl.startsWith("/api/docs");
-    if (isProduction && !allowSwagger) return res.status(403).json({ message: "Acceso a la API no permitido en producción." });
+    const allowStatic = req.originalUrl.startsWith("/profile") || req.originalUrl === "/";
+    if (isProduction && !allowSwagger && !allowStatic) return res.status(403).json({ message: "Acceso a la API no permitido en producción." });
     next();
 });  
 
