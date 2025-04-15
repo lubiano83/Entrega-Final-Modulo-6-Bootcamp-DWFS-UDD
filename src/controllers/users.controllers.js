@@ -3,8 +3,6 @@ import SessionsDao from "../dao/sessions.dao.js";
 import { createHash, isValidPassword } from "../utils/bcrypt.utils.js";
 import { bucket } from "../config/firebase.config.js";
 import jwt from "jsonwebtoken";
-import fs from "fs";
-import path from "path";
 
 const usersDao = new UsersDao();
 const sessionsDao = new SessionsDao();
