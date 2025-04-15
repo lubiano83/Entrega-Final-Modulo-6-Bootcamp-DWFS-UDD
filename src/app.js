@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import usersRouter from "./routes/users.router.js";
 import sessionsRouter from "./routes/sessions.router.js";
 import seasonsRouter from "./routes/seasons.router.js";
@@ -25,7 +26,11 @@ APP.use(cookieParser());
 APP.use(passport.initialize());
 initializePassport();
 
-// 🔐 Middleware para bloquear acceso en producción (debe ir *después* de rutas y Swagger)
+APP.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
+
 APP.use((req, res, next) => {
     const isProduction = process.env.NODE_ENV === "production";
     const allowSwagger = req.originalUrl.startsWith("/api/docs");
