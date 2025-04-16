@@ -92,8 +92,8 @@ export default class SessionsControllers {
 
     usersLogged = async( req, res ) => {
         try {
-            const users = await sessionsDao.gets();
-            const usersOnline = users.length;
+            const sessions = await sessionsDao.gets();
+            const usersOnline = sessions.length;
             return res.status( 200 ).send({ payload: usersOnline });
         } catch ( error ) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });

@@ -3,7 +3,7 @@ info:
   title: "Documentación de la App de Reservas de Cabañas - Cabañas"
   description: "API para la administración y consulta de cabañas disponibles para hospedaje."
   version: "1.0.0"
-  
+
 servers:
   - url: http://localhost:8080
 
@@ -18,11 +18,66 @@ security:
   - bearerAuth: []
 
 paths:
-  /api/sessions/registered:
+
+  /api/sessions:
+    get:
+      summary: "Obtener todas las sesiones"
+      description: "Devuelve un listado de todas las sesiones activas en la plataforma."
+      tags:
+        - Sessions
+      responses:
+        '200':
+          description: "Sesiones obtenidas con éxito."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Todas las Sesiones.."
+                  sessions:
+                    type: array
+                    items:
+                      type: object
+        '500':
+          description: "Error interno del servidor."
+
+  /api/sessions/{userId}:
+    get:
+      summary: "Obtener sesión por ID de usuario"
+      description: "Devuelve la sesión activa correspondiente a un usuario específico."
+      tags:
+        - Sessions
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: "ID del usuario"
+      responses:
+        '200':
+          description: "Sesión obtenida con éxito."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "sesion obtenida por el id.."
+                  session:
+                    type: object
+        '404':
+          description: "Sesión no encontrada."
+        '500':
+          description: "Error interno del servidor."
+
+  /api/sessions/users/registered:
     get:
       summary: "Obtener cantidad de usuarios registrados"
-      description: "Retorna el número total de usuarios registrados en la plataforma."
-      tags: 
+      tags:
         - Sessions
       responses:
         '200':
@@ -38,11 +93,10 @@ paths:
         '500':
           description: "Error interno del servidor."
 
-  /api/sessions/logged:
+  /api/sessions/users/logged:
     get:
       summary: "Obtener cantidad de usuarios logueados"
-      description: "Retorna el número total de usuarios con sesión activa en la plataforma."
-      tags: 
+      tags:
         - Sessions
       responses:
         '200':
@@ -61,12 +115,11 @@ paths:
   /api/sessions/register:
     post:
       summary: "Registrar un nuevo usuario"
-      description: "Crea un nuevo usuario con los datos proporcionados."
-      tags: 
+      tags:
         - Sessions
       requestBody:
-        description: "Datos requeridos para el registro de un usuario."
         required: true
+        description: "Datos requeridos para el registro de usuario."
         content:
           application/json:
             schema:
@@ -81,20 +134,20 @@ paths:
               properties:
                 first_name:
                   type: string
-                  default: "Juan"
+                  example: "Juan"
                 last_name:
                   type: string
-                  default: "Pérez"
+                  example: "Pérez"
                 email:
                   type: string
                   format: email
-                  default: "juan.perez@example.com"
+                  example: "juan.perez@example.com"
                 phone:
                   type: string
-                  default: "+56912345678"
+                  example: "+56912345678"
                 password:
                   type: string
-                  default: "123456"
+                  example: "123456"
                 address:
                   type: object
                   required:
@@ -106,38 +159,37 @@ paths:
                   properties:
                     country:
                       type: string
-                      default: "Chile"
+                      example: "Chile"
                     state:
                       type: string
-                      default: "Santiago"
+                      example: "Región Metropolitana"
                     city:
                       type: string
-                      default: "Santiago"
+                      example: "Santiago"
                     street:
                       type: string
-                      default: "Av. Siempre Viva"
+                      example: "Av. Siempre Viva"
                     number:
                       type: string
-                      default: "123"
+                      example: "123"
       responses:
         '201':
           description: "Usuario registrado con éxito."
         '400':
           description: "Solicitud incorrecta, faltan campos o formato inválido."
         '409':
-          description: "Conflicto en el registro (email existente o contraseña inválida)."
+          description: "Email ya registrado o contraseña inválida."
         '500':
           description: "Error interno del servidor."
 
   /api/sessions/login:
     post:
       summary: "Autenticar usuario (Login)"
-      description: "Inicia sesión para un usuario registrado utilizando email y password."
       tags:
         - Sessions
       requestBody:
-        description: "Credenciales del usuario."
         required: true
+        description: "Credenciales del usuario para iniciar sesión."
         content:
           application/json:
             schema:
@@ -149,10 +201,10 @@ paths:
                 email:
                   type: string
                   format: email
-                  default: "juan.perez@example.com"
+                  example: "juan.perez@example.com"
                 password:
                   type: string
-                  default: "123456"
+                  example: "123456"
       responses:
         '200':
           description: "Login realizado con éxito."
@@ -173,13 +225,14 @@ paths:
           description: "Contraseña incorrecta."
         '404':
           description: "Email no registrado."
+        '409':
+          description: "Usuario ya logeado."
         '500':
           description: "Error interno del servidor."
 
   /api/sessions/logout:
     post:
       summary: "Cerrar sesión (Logout)"
-      description: "Finaliza la sesión del usuario y elimina la cookie o el token."
       tags:
         - Sessions
       security:
