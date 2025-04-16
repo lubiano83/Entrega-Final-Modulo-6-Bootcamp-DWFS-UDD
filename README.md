@@ -66,11 +66,13 @@ Clona el repositorio y ejecuta:
 ---
 
 ### 👤 Sesiones y Autenticación (`/api/sessions`)
-- `GET /api/sessions/registered` → Obtener cantidad de usuarios registrados.
-- `GET /api/sessions/logged` → Obtener cantidad de usuarios actualmente logueados.
+- `GET /api/sessions` → Mostrar todas las sesiones.
+- `GET /api/sessions/{userId}` → Mostrar una sesion por el id.
 - `POST /api/sessions/register` → Registrar un nuevo usuario.
 - `POST /api/sessions/login` → Iniciar sesión de usuario.
 - `POST /api/sessions/logout` → Cerrar sesión de usuario.
+- `GET /api/sessions/users/registered` → Obtener cantidad de usuarios registrados.
+- `GET /api/sessions/users/logged` → Obtener cantidad de usuarios actualmente logueados.
 
 ---
 
@@ -92,7 +94,7 @@ Clona el repositorio y ejecuta:
 
 La documentación de la API está disponible en:
 
-http://localhost:8080/api/docs
+https://entrega-final-modulo-6-bootcamp-dwfs-udd.onrender.com/api/docs/
 
 ## ❗ Manejo de Errores
 
