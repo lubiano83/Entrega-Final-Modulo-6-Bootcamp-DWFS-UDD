@@ -35,18 +35,15 @@ APP.use((req, res, next) => {
     const isProduction = process.env.NODE_ENV === "production";
     const allowSwagger = req.originalUrl.startsWith("/api/docs");
     const allowStatic = req.originalUrl.startsWith("/profile") || req.originalUrl === "/";
-    if (isProduction && !allowSwagger && !allowStatic) return res.status(403).json({ message: "Acceso a la API no permitido en producción." });
+    if (isProduction && !allowSwagger && !allowStatic) return res.status(403).json({ message: "Acceso a la API no permitido en producción.." });
     next();
 });  
 
 // Servir imágenes desde la carpeta public
 APP.use("/", express.static(path.join(process.cwd(), "src/public")));
 
-// Servir imágenes personalizadas desde la carpeta public/profile
-APP.use("/profile", express.static(path.join(process.cwd(), "src/public/profile")));
-
 // Rutas
-APP.get("/", (req, res) => res.send(`<h1>Este es nuestro backend de un sistema de reservas!!</h1><br/>  <a href="/api/docs" target="_blank"><button>Swagger</button></a>`));
+APP.get("/", (req, res) => res.send(`<h1>Este es nuestro backend de un sistema de reservas!!</h1> <h3>Para obtener mas información, ingresa a nuestra documentación con Swagger..</h3>  <a href="/api/docs" target="_blank"><button>Swagger</button></a>`));
 APP.use("/api/users", usersRouter);
 APP.use("/api/sessions", sessionsRouter);
 APP.use("/api/seasons", seasonsRouter);

@@ -14,8 +14,8 @@ export default class LodgesControllers {
             if (bathroom) filters.bathroom = Number(bathroom);
             if (capacity) filters.capacity = Number(capacity);
             if (high) filters["season.high"] = Number(high);
-            if (medium) filters["season.high.medium"] = Number(medium);
-            if (low) filters["season.high.low"] = Number(low);
+            if (medium) filters["season.medium"] = Number(medium);
+            if (low) filters["season.low"] = Number(low);
             
             const result = await lodgesDao.paginate(filters, { page: parseInt(page), limit: parseInt(limit) });
             let lodges = result.docs;
