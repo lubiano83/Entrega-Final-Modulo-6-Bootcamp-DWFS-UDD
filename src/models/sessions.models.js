@@ -21,5 +21,10 @@ const sessionSchema = new mongoose.Schema({
     },
 });
 
+sessionSchema.pre(/^find/, function (next) {
+    this.populate("userId")
+    next();
+});
+
 const SessionModel = mongoose.models[collection] || mongoose.model(collection, sessionSchema);
 export default SessionModel;
