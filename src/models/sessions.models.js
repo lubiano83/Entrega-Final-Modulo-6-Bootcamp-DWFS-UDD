@@ -22,7 +22,7 @@ const sessionSchema = new mongoose.Schema({
 });
 
 sessionSchema.pre(/^find/, function (next) {
-    this.populate("userId")
+    this.populate("user")
     next();
 });
 
