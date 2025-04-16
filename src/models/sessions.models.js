@@ -7,7 +7,7 @@ const sessionSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
-        required: true, // Asegúrate de que sea requerido si siempre debe estar presente
+        required: true,
     },
     token: {
         type: String,
@@ -22,7 +22,7 @@ const sessionSchema = new mongoose.Schema({
 });
 
 sessionSchema.pre(/^find/, function (next) {
-    this.populate("user")
+    this.populate("userId")
     next();
 });
 

@@ -1,13 +1,15 @@
 import { Router } from "express";
-import UsersControllers from "../controllers/users.controllers.js";
+import SessionsControllers from "../controllers/sessions.controllers.js";
 
 const ROUTER = Router();
-const usersController = new UsersControllers();
+const sessionsControllers = new SessionsControllers();
 
-ROUTER.get("/registered", usersController.usersRegistered);
-ROUTER.get("/logged", usersController.usersLogged);
-ROUTER.post("/register", usersController.registerUser);
-ROUTER.post("/login", usersController.loginUser);
-ROUTER.post("/logout", usersController.logoutUser);
+ROUTER.get("/", sessionsControllers.getSessions);
+ROUTER.get("/:userId", sessionsControllers.getSessionById);
+ROUTER.get("/registered", sessionsControllers.usersRegistered);
+ROUTER.get("/logged", sessionsControllers.usersLogged);
+ROUTER.post("/register", sessionsControllers.registerUser);
+ROUTER.post("/login", sessionsControllers.loginUser);
+ROUTER.post("/logout", sessionsControllers.logoutUser);
 
 export default ROUTER;
