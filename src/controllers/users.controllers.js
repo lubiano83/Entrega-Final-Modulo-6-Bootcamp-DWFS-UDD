@@ -160,12 +160,15 @@ export default class UsersControllers {
     deleteAllUsers = async (req, res) => {
         try {
             const users = await usersDao.gets();
-        
+    
             for (const user of users) {
-                if (user.image && user.image.includes("storage.googleapis.com") && !user.image.includes("user-circle-svgrepo-com.svg")) {
+                if (
+                    user.image && user.image.includes("firebasestorage.googleapis.com") && !user.image.includes("user-circle-svgrepo-com.svg")
+                ) {
                     try {
                         const imageUrl = new URL(user.image);
-                        const pathInBucket = imageUrl.pathname.replace(`/${bucket.name}/`, "");
+                        const pathEncoded = imageUrl.pathname.split("/o/")[1];
+                        const pathInBucket = decodeURIComponent(pathEncoded);
                         const file = bucket.file(pathInBucket);
                         await file.delete();
                     } catch (err) {
@@ -173,12 +176,12 @@ export default class UsersControllers {
                     }
                 }
             }
-        
+    
             await usersDao.deleteAll();
-            return res.status(200).send({ message: "Todos los usuarios eliminados con éxito." });
+            return res.status(200).send({ message: "Todos los usuarios e imágenes fueron eliminados con éxito." });
         } catch (error) {
             return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
         }
     };
-
+    
 };
