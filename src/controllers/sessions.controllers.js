@@ -11,7 +11,7 @@ export default class SessionsControllers {
     getSessions = async(req, res) => {
         try {
             const sessions = await sessionsDao.gets();
-            return res.status(200).send({ message: "Todas las Sesiones..", sessions });
+            return res.status(200).send({ message: "Todas las Sesiones..", payload: sessions });
         } catch (error) {
             return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
         }
@@ -22,7 +22,7 @@ export default class SessionsControllers {
             const { userId } = req.params;
             const session = await sessionsDao.getById(userId);
             if(!session) return res.status(404).send({ message: "Sesion no encontrada.." });
-            return res.status(200).send({ message: "sesion obtenida por el id..", session });
+            return res.status(200).send({ message: "sesion obtenida por el id..", payload: session });
         } catch (error) {
             return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
         }
