@@ -74,7 +74,7 @@ export default class SessionsControllers {
             const token = req.cookies[process.env.COOKIE_NAME] || req.headers.authorization?.split(" ")[1];
             if (!token) return res.status(401).send({ message: "Token no encontrado, sesión cerrada.." });
             // res.clearCookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: false, sameSite: "lax", path: "/", maxAge: 1000 * 60 * 60 });
-            res.clearCookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 1000 * 60 * 60 });
+            res.clearCookie(process.env.COOKIE_NAME, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 1000 * 60 * 60 });
             await sessionsDao.delete(token);
             return res.status(200).send({ message: "Logout realizado con éxito.." });
         } catch (error) {
