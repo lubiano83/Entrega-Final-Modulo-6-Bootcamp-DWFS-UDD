@@ -54,12 +54,13 @@ export default class SessionsControllers {
             const { email, password } = req.body;
             if( !email || !password ) return res.status( 400 ).send({ message: "Todos los campos son requeridos.." });
             const users = await usersDao.getByProperty({ email: email.toLowerCase().trim() });
+            console.log(users)
             if( users.length === 0 ) return res.status( 404 ).send({ message: "Ese email no esta registrado.." });
             const passwordMatch = await isValidPassword(users[0], String(password).trim());
             if ( !passwordMatch ) return res.status( 401 ).send({ status: 401, message: "La contraseña es incorrecta.." });
             const userLogged = req.cookies[ process.env.COOKIE_NAME ];
             if ( userLogged ) return res.status( 409 ).send({ message: "Ese usuario ya está logeado.." });
-            const token = jwt.sign({ email: users[0].email.toLowerCase(), first_name: users[0].first_name.toLowerCase(), last_name: users[0].last_name.toLowerCase(), phone: users[0].phone, role: users[0].role.toLowerCase(), id: users[0]._id.toString() }, process.env.COOKIE_KEY, { expiresIn: "1h" });
+            const token = jwt.sign({ id: users[0]._id, email: users[0].email.toLowerCase(), first_name: users[0].first_name.toLowerCase(), last_name: users[0].last_name.toLowerCase(), phone: users[0].phone, role: users[0].role.toLowerCase(), id: users[0]._id.toString() }, process.env.COOKIE_KEY, { expiresIn: "1h" });
             // res.cookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: false, sameSite: "lax", path: "/", maxAge: 1000 * 60 * 60 });
             res.cookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 1000 * 60 * 60 });
             await sessionsDao.create(users[0]._id, token);
@@ -102,7 +103,7 @@ export default class SessionsControllers {
         }
     };
 
-    getCurrentSession = async (req, res) => {
+    getCurrentSession = async(req, res) => {
         try {
             const token = req.cookies[process.env.COOKIE_NAME];
             if (!token) return res.status(401).send({ message: "No hay sesión activa.." });
