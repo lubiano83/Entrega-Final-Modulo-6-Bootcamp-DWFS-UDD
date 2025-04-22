@@ -7,7 +7,7 @@ const collection = "users";
 const userSchema = new mongoose.Schema({
     image: {
         type: String,
-        default: "../public/user-circle-svgrepo-com.svg"
+        default: "https://firebasestorage.googleapis.com/v0/b/portfolio-3e2be.appspot.com/o/lasTrancasLodges%2Fprofile-pic.webp?alt=media&token=a725178d-14bf-4ad6-bfb8-726189431331"
     },
     first_name: {
         type: String,

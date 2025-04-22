@@ -140,7 +140,7 @@ export default class UsersControllers {
             const { id } = req.params;
             const user = await usersDao.getById(id);
             if (!user) return res.status(404).send({ message: "Ese usuario no existe.." });
-            if (user.image && user.image.includes("storage.googleapis.com") && !user.image.includes("user-circle-svgrepo-com.svg")) {
+            if (user.image && user.image.includes("storage.googleapis.com") && !user.image.includes("https://firebasestorage.googleapis.com/v0/b/portfolio-3e2be.appspot.com/o/lasTrancasLodges%2Fprofile-pic.webp?alt=media&token=a725178d-14bf-4ad6-bfb8-726189431331")) {
                 try {
                     const imageUrl = new URL(user.image);
                     const pathInBucket = imageUrl.pathname.replace(`/${bucket.name}/`, "");
@@ -163,7 +163,7 @@ export default class UsersControllers {
     
             for (const user of users) {
                 if (
-                    user.image && user.image.includes("firebasestorage.googleapis.com") && !user.image.includes("user-circle-svgrepo-com.svg")
+                    user.image && user.image.includes("firebasestorage.googleapis.com") && !user.image.includes("https://firebasestorage.googleapis.com/v0/b/portfolio-3e2be.appspot.com/o/lasTrancasLodges%2Fprofile-pic.webp?alt=media&token=a725178d-14bf-4ad6-bfb8-726189431331")
                 ) {
                     try {
                         const imageUrl = new URL(user.image);
