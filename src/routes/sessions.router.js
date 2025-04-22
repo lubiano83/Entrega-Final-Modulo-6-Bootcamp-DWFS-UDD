@@ -11,5 +11,6 @@ ROUTER.post("/login", sessionsControllers.loginUser);
 ROUTER.post("/logout", sessionsControllers.logoutUser);
 ROUTER.get("/users/registered", sessionsControllers.usersRegistered);
 ROUTER.get("/users/logged", sessionsControllers.usersLogged);
+ROUTER.get("/current/user", sessionsControllers.getCurrentSession);
 
 export default ROUTER;

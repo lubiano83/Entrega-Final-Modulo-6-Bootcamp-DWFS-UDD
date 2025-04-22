@@ -102,4 +102,17 @@ export default class SessionsControllers {
         }
     };
 
+    getCurrentSession = async (req, res) => {
+        try {
+            const token = req.cookies[process.env.COOKIE_NAME];
+            if (!token) return res.status(401).send({ message: "No hay sesión activa.." });
+            const session = await sessionsDao.getToken(token);
+            if (!session) return res.status(401).send({ message: "Sesión no válida.." });
+            const user = await usersDao.getById(session.userId._id);
+            if (!user) return res.status(404).send({ message: "Usuario no encontrado.." });
+            return res.status(200).send({ message: "Sesion encontrada con exito..", token });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
 };
