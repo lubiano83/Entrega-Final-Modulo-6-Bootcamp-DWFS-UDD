@@ -60,7 +60,8 @@ export default class SessionsControllers {
             const userLogged = req.cookies[ process.env.COOKIE_NAME ];
             if ( userLogged ) return res.status( 409 ).send({ message: "Ese usuario ya está logeado.." });
             const token = jwt.sign({ email: users[0].email.toLowerCase(), first_name: users[0].first_name.toLowerCase(), last_name: users[0].last_name.toLowerCase(), phone: users[0].phone, role: users[0].role.toLowerCase(), id: users[0]._id.toString() }, process.env.COOKIE_KEY, { expiresIn: "1h" });
-            res.cookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: false, sameSite: "lax", path: "/", maxAge: 1000 * 60 * 60 });
+            // res.cookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: false, sameSite: "lax", path: "/", maxAge: 1000 * 60 * 60 });
+            res.cookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 1000 * 60 * 60 });
             await sessionsDao.create(users[0]._id, token);
             return res.status( 200 ).send({ message: "Login realizado con éxito", token });
         } catch ( error ) {
@@ -72,7 +73,8 @@ export default class SessionsControllers {
         try {
             const token = req.cookies[process.env.COOKIE_NAME] || req.headers.authorization?.split(" ")[1];
             if (!token) return res.status(401).send({ message: "Token no encontrado, sesión cerrada.." });
-            res.clearCookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: false, sameSite: "lax", path: "/", maxAge: 1000 * 60 * 60 });
+            // res.clearCookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: false, sameSite: "lax", path: "/", maxAge: 1000 * 60 * 60 });
+            res.clearCookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 1000 * 60 * 60 });
             await sessionsDao.delete(token);
             return res.status(200).send({ message: "Logout realizado con éxito.." });
         } catch (error) {
