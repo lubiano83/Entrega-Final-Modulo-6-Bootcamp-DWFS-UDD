@@ -19,17 +19,17 @@ const APP = express();
 const PORT = 8080;
 const HOST = "localhost";
 
+APP.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
+
 // Middlewares
 APP.use(express.json());
 APP.use(express.urlencoded({ extended: true }));
 APP.use(cookieParser());
 APP.use(passport.initialize());
 initializePassport();
-
-APP.use(cors({
-    origin: "http://localhost:5173",
-    credentials: true
-}));
 
 // APP.use((req, res, next) => {
 //     const isProduction = process.env.NODE_ENV === "production";
@@ -60,9 +60,9 @@ APP.use((req, res) => {
 });
 
 // Control de errores internos
-APP.use((error, req, res) => {
+APP.use((error, req, res, next) => {
     console.error("Error:", error.message);
-    res.status(500).send("<h1>Error 500: Error en el Servidor</h1>");
+    res.status(500).send({ message: "Error interno del servidor", error: error.message });
 });
 
 // Listening
