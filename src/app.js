@@ -20,7 +20,10 @@ const PORT = 8080;
 const HOST = "localhost";
 
 APP.use(cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://entrega-final-modulo-6-bootcamp-dwfs-udd.onrender.com"
+    ],
     credentials: true
 }));
 

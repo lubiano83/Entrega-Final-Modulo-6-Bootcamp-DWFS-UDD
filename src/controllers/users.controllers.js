@@ -89,7 +89,7 @@ export default class UsersControllers {
             } catch (err) {
               console.warn("No se pudo eliminar la imagen anterior:", err.message);
             }
-        };          
+        };
 
         const fileName = `profile/${Date.now()}-${req.file.originalname}`;
         const file = bucket.file(fileName);
