@@ -3,12 +3,9 @@ import { connectDB } from "../config/mongoose.config.js";
 
 export default class SeasonsDao {
 
-    constructor() {
-        connectDB(); // Intentamos conectar a la base de datos
-    }
-
     gets = async() => {
         try {
+            await connectDB();
             return await SeasonModel.find();
         } catch (error) {
             throw new Error( "Hubo un error en el servidor..", error.message );
@@ -17,6 +14,7 @@ export default class SeasonsDao {
 
     create = async( data ) => {
         try {
+            await connectDB();
             const item = await SeasonModel( data );
             await item.save();
             return item;
@@ -27,6 +25,7 @@ export default class SeasonsDao {
 
     deleteAll = async () => {
         try {
+            await connectDB();
             await SeasonModel.deleteMany({});
             return await this.gets();
         } catch (error) {

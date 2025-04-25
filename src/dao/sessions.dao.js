@@ -2,12 +2,10 @@ import SessionModel from "../models/sessions.models.js";
 import { isValidId, connectDB } from "../config/mongoose.config.js";
 
 export default class SessionsDao {
-    constructor() {
-        connectDB(); // Conecta a la base de datos
-    }
 
     gets = async () => {
         try {
+            await connectDB();
             return await SessionModel.find();
         } catch ( error ) {
             throw new Error( "Hubo un error en el servidor..", error.message );
@@ -16,6 +14,7 @@ export default class SessionsDao {
 
     create = async ( userId, token ) => {
         try {
+            await connectDB();
             if ( !isValidId( userId )) throw new Error( "ID no válido.." );
             if ( !token ) throw new Error( "El token es requerido.." );
             const item = new SessionModel({ userId, token });
@@ -28,6 +27,7 @@ export default class SessionsDao {
 
     getById = async( userId ) => {
         try {
+            await connectDB();
             if ( !isValidId( userId )) throw new Error( "ID no válido.." );
             const item = await SessionModel.findOne({ userId });
             return item;
@@ -38,6 +38,7 @@ export default class SessionsDao {
 
     delete = async ( token ) => {
         try {
+            await connectDB();
             if ( !token ) throw new Error( "El token es requerido.." );
             const item = await SessionModel.findOneAndDelete({ token });
             if ( !item ) throw new Error( "Sesión no encontrada.." );
@@ -48,6 +49,7 @@ export default class SessionsDao {
 
     getToken = async ( token ) => {
         try {
+            await connectDB();
             if ( !token ) throw new Error( "El token es requerido.." );
             const item = await SessionModel.findOne({ token });
             if ( !item ) throw new Error( "No encontrado.." );
@@ -59,6 +61,7 @@ export default class SessionsDao {
 
     deleteAll = async () => {
         try {
+            await connectDB();
             await SessionModel.deleteMany({});
             return await this.gets();
         } catch (error) {

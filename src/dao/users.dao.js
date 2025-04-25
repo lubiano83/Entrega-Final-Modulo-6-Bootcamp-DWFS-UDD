@@ -3,12 +3,9 @@ import { connectDB, isValidId } from "../config/mongoose.config.js";
 
 export default class UsersDao {
 
-    constructor() {
-        connectDB(); // Intentamos conectar a la base de datos
-    }
-
     paginate = async (filters = {}, options = {}) => {
         try {
+            await connectDB();
             return await UserModel.paginate(filters, options);
         } catch (error) {
             throw new Error( "Hubo un error en el servidor..", error.message );
@@ -17,6 +14,7 @@ export default class UsersDao {
 
     gets = async() => {
         try {
+            await connectDB();
             return await UserModel.find();
         } catch (error) {
             throw new Error( "Hubo un error en el servidor..", error.message );
@@ -25,6 +23,7 @@ export default class UsersDao {
 
     getById = async( id ) => {
         try {
+            await connectDB();
             if (!isValidId(id)) throw new Error("ID no válido..");
             return await UserModel.findOne({ _id: id });
         } catch (error) {
@@ -34,6 +33,7 @@ export default class UsersDao {
 
     getByProperty = async( doc ) => {
         try {
+            await connectDB();
             return await UserModel.find( doc );
         } catch (error) {
             throw new Error( "Hubo un error en el servidor..", error.message );
@@ -42,6 +42,7 @@ export default class UsersDao {
 
     create = async( data ) => {
         try {
+            await connectDB();
             const item = await UserModel( data );
             await item.save();
             return item;
@@ -52,6 +53,7 @@ export default class UsersDao {
 
     updateById = async (id, doc) => {
         try {
+            await connectDB();
             if (!isValidId(id)) throw new Error("ID no válido..");
             const item = await this.getById(id);
             if (!item) throw new Error("No encontrado..");
@@ -63,6 +65,7 @@ export default class UsersDao {
 
     deleteById = async( id ) => {
         try {
+            await connectDB();
             if ( !isValidId( id )) throw new Error("ID no válido..");
             const item = await this.getById( id );
             if ( !item ) return new Error("No encontrado..");
@@ -74,6 +77,7 @@ export default class UsersDao {
 
     deleteAll = async () => {
         try {
+            await connectDB();
             await UserModel.deleteMany({});
             return await this.gets();
         } catch (error) {
