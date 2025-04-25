@@ -22,9 +22,7 @@ paths:
   /api/sessions:
     get:
       summary: "Obtener todas las sesiones"
-      description: "Devuelve un listado de todas las sesiones activas en la plataforma."
-      tags:
-        - Sessions
+      tags: [Sessions]
       responses:
         '200':
           description: "Sesiones obtenidas con éxito."
@@ -35,8 +33,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Todas las Sesiones.."
-                  sessions:
+                  payload:
                     type: array
                     items:
                       type: object
@@ -46,12 +43,10 @@ paths:
   /api/sessions/{userId}:
     get:
       summary: "Obtener sesión por ID de usuario"
-      description: "Devuelve la sesión activa correspondiente a un usuario específico."
-      tags:
-        - Sessions
+      tags: [Sessions]
       parameters:
-        - name: userId
-          in: path
+        - in: path
+          name: userId
           required: true
           schema:
             type: string
@@ -66,60 +61,19 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "sesion obtenida por el id.."
-                  session:
+                  payload:
                     type: object
         '404':
           description: "Sesión no encontrada."
         '500':
           description: "Error interno del servidor."
 
-  /api/sessions/users/registered:
-    get:
-      summary: "Obtener cantidad de usuarios registrados"
-      tags:
-        - Sessions
-      responses:
-        '200':
-          description: "Número de usuarios registrados obtenido exitosamente."
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  payload:
-                    type: integer
-                    example: 100
-        '500':
-          description: "Error interno del servidor."
-
-  /api/sessions/users/logged:
-    get:
-      summary: "Obtener cantidad de usuarios logueados"
-      tags:
-        - Sessions
-      responses:
-        '200':
-          description: "Número de usuarios logueados obtenido exitosamente."
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  payload:
-                    type: integer
-                    example: 10
-        '500':
-          description: "Error interno del servidor."
-
   /api/sessions/register:
     post:
       summary: "Registrar un nuevo usuario"
-      tags:
-        - Sessions
+      tags: [Sessions]
       requestBody:
         required: true
-        description: "Datos requeridos para el registro de usuario."
         content:
           application/json:
             schema:
@@ -134,20 +88,15 @@ paths:
               properties:
                 first_name:
                   type: string
-                  example: "Juan"
                 last_name:
                   type: string
-                  example: "Pérez"
                 email:
                   type: string
                   format: email
-                  example: "juan.perez@example.com"
                 phone:
                   type: string
-                  example: "+56912345678"
                 password:
                   type: string
-                  example: "123456"
                 address:
                   type: object
                   required:
@@ -159,24 +108,19 @@ paths:
                   properties:
                     country:
                       type: string
-                      example: "Chile"
                     state:
                       type: string
-                      example: "Región Metropolitana"
                     city:
                       type: string
-                      example: "Santiago"
                     street:
                       type: string
-                      example: "Av. Siempre Viva"
                     number:
                       type: string
-                      example: "123"
       responses:
         '201':
           description: "Usuario registrado con éxito."
         '400':
-          description: "Solicitud incorrecta, faltan campos o formato inválido."
+          description: "Datos inválidos o incompletos."
         '409':
           description: "Email ya registrado o contraseña inválida."
         '500':
@@ -184,12 +128,10 @@ paths:
 
   /api/sessions/login:
     post:
-      summary: "Autenticar usuario (Login)"
-      tags:
-        - Sessions
+      summary: "Login de usuario"
+      tags: [Sessions]
       requestBody:
         required: true
-        description: "Credenciales del usuario para iniciar sesión."
         content:
           application/json:
             schema:
@@ -200,11 +142,8 @@ paths:
               properties:
                 email:
                   type: string
-                  format: email
-                  example: "juan.perez@example.com"
                 password:
                   type: string
-                  example: "123456"
       responses:
         '200':
           description: "Login realizado con éxito."
@@ -215,12 +154,10 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Login realizado con éxito"
                   token:
                     type: string
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         '400':
-          description: "Solicitud incorrecta, faltan campos."
+          description: "Faltan campos."
         '401':
           description: "Contraseña incorrecta."
         '404':
@@ -232,9 +169,8 @@ paths:
 
   /api/sessions/logout:
     post:
-      summary: "Cerrar sesión (Logout)"
-      tags:
-        - Sessions
+      summary: "Cerrar sesión"
+      tags: [Sessions]
       security:
         - bearerAuth: []
       responses:
@@ -242,5 +178,64 @@ paths:
           description: "Logout realizado con éxito."
         '401':
           description: "Token no encontrado."
+        '500':
+          description: "Error interno del servidor."
+
+  /api/sessions/users/registered:
+    get:
+      summary: "Cantidad de usuarios registrados"
+      tags: [Sessions]
+      responses:
+        '200':
+          description: "Cantidad de usuarios obtenida."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload:
+                    type: integer
+        '500':
+          description: "Error interno del servidor."
+
+  /api/sessions/users/logged:
+    get:
+      summary: "Cantidad de usuarios logueados"
+      tags: [Sessions]
+      responses:
+        '200':
+          description: "Cantidad de sesiones activas."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  payload:
+                    type: integer
+        '500':
+          description: "Error interno del servidor."
+
+  /api/sessions/current/user:
+    get:
+      summary: "Obtener sesión actual"
+      tags: [Sessions]
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: "Sesión encontrada con éxito."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  token:
+                    type: string
+        '401':
+          description: "Sesión no activa o inválida."
+        '404':
+          description: "Usuario no encontrado."
         '500':
           description: "Error interno del servidor."

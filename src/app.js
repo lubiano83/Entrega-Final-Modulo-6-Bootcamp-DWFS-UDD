@@ -31,14 +31,6 @@ APP.use(cookieParser());
 APP.use(passport.initialize());
 initializePassport();
 
-// APP.use((req, res, next) => {
-//     const isProduction = process.env.NODE_ENV === "production";
-//     const allowSwagger = req.originalUrl.startsWith("/api/docs");
-//     const allowStatic = req.originalUrl.startsWith("/profile") || req.originalUrl === "/";
-//     if (isProduction && !allowSwagger && !allowStatic) return res.status(403).json({ message: "Acceso a la API no permitido en producción.." });
-//     next();
-// });  
-
 // Servir imágenes desde la carpeta public
 APP.use("/", express.static(path.join(process.cwd(), "src/public")));
 
