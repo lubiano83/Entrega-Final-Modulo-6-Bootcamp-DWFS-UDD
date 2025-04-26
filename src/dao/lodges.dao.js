@@ -40,10 +40,10 @@ export default class LodgesDao {
         }
     };
 
-    create = async( data ) => {
+    create = async( userId, data ) => {
         try {
             await connectDB();
-            const item = await LodgeModel( data );
+            const item = await LodgeModel( userId, data );
             await item.save();
             return item;
         } catch (error) {
@@ -75,7 +75,7 @@ export default class LodgesDao {
         }
     };
 
-    deleteAllLodges = async () => {
+    deleteAll = async () => {
         try {
             await connectDB();
             await LodgeModel.deleteMany({});

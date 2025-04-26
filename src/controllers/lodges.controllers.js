@@ -1,6 +1,8 @@
 import LodgesDao from "../dao/lodges.dao.js";
+import UsersDao from "../dao/users.dao.js";
 
 const lodgesDao = new LodgesDao();
+const usersDao = new UsersDao();
 
 export default class LodgesControllers {
 
@@ -47,12 +49,25 @@ export default class LodgesControllers {
         }
     };
 
+    getLodgesByUserId = async(req, res) => {
+        try {
+            const { userId } = req.params;
+            const user = await usersDao.getById(userId);
+            if(!user) return res.status(400).send({ message: "El userId ingresado no existe.." });
+            const lodges = await lodgesDao.getByProperty({ userId: userId });
+            return res.status(200).send({ message: "Todos los lodges por el userId..", payload: lodges });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
     createLodge = async(req, res) => {
         try {
+            const { userId } = req.params;
             const { hotel, size, bedroom, bathroom, capacity, season } = req.body;
             const { high, medium, low } = season;
-            if(!hotel || !size || !bedroom || !bathroom || !capacity || !high || !medium || !low) return res.status(400).send({ message: "Todos los campos son requeridos.." });
-            const lodgeCreated = { hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), season: { high: Number(high), medium: Number(medium), low: Number(low) } };
+            if(!userId, !hotel || !size || !bedroom || !bathroom || !capacity || !high || !medium || !low) return res.status(400).send({ message: "Todos los campos son requeridos.." });
+            const lodgeCreated = { userId: String(userId), hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), season: { high: Number(high), medium: Number(medium), low: Number(low) } };
             if(isNaN(Number(size)) || isNaN(Number(bedroom)) || isNaN(Number(bathroom)) || isNaN(Number(capacity)) || isNaN(Number(high)) || isNaN(Number(medium)) || isNaN(Number(low))) return res.status(400).send({ message: "El campo: size, bedrrom, bathrrom, capacity, high, medium, low, deben ser tipo numero.." });
             await lodgesDao.create(lodgeCreated);
             return res.status(201).send({ message: "Lodge creado con exito.." });

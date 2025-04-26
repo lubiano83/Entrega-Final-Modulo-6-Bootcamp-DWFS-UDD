@@ -4,6 +4,10 @@ import paginate from "mongoose-paginate-v2";
 const collection = "lodges";
 
 const lodgeSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "users"
+    },
     image: {
         type: Array,
         default: []
@@ -58,7 +62,6 @@ const lodgeSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-       
 });
 
 lodgeSchema.plugin(paginate);
