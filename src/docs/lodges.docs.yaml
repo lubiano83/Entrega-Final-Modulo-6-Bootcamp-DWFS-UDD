@@ -1,13 +1,14 @@
 openapi: "3.0.3"
 info:
-  title: "Documentación de la App de Reservas de Cabañas - Cabañas"
-  description: "API para la administración y consulta de cabañas disponibles para hospedaje."
+  title: "Documentación de la App de Reservas de Cabañas - Lodges"
+  description: "API para la administración y consulta de cabañas disponibles para hospedaje en Las Trancas Lodges."
   version: "1.0.0"
 
 servers:
   - url: http://localhost:8080
 
 paths:
+
   /api/lodges:
     get:
       summary: Obtener lodges filtrados
@@ -53,40 +54,7 @@ paths:
           schema: { type: integer, default: 10 }
       responses:
         '200':
-          description: Lista de lodges.
-        '500':
-          description: Error del servidor.
-
-    post:
-      summary: Crear lodge
-      description: Crea una nueva cabaña.
-      tags:
-        - Lodges
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [hotel, size, bedroom, bathroom, capacity, season]
-              properties:
-                hotel: { type: string, example: "cabaña el sol" }
-                size: { type: number, example: 80 }
-                bedroom: { type: number, example: 3 }
-                bathroom: { type: number, example: 2 }
-                capacity: { type: number, example: 6 }
-                season:
-                  type: object
-                  required: [high, medium, low]
-                  properties:
-                    high: { type: number, example: 120000 }
-                    medium: { type: number, example: 95000 }
-                    low: { type: number, example: 75000 }
-      responses:
-        '201':
-          description: Lodge creado con éxito.
-        '400':
-          description: Datos inválidos.
+          description: Lista de lodges filtrada y paginada.
         '500':
           description: Error del servidor.
 
@@ -97,7 +65,7 @@ paths:
         - Lodges
       responses:
         '200':
-          description: Todos los lodges eliminados.
+          description: Todos los lodges eliminados con éxito.
         '500':
           description: Error del servidor.
 
@@ -136,46 +104,28 @@ paths:
               type: object
               required: [hotel, size, bedroom, bathroom, capacity, wifi, season]
               properties:
-                hotel:
-                  type: string
-                  default: "cabaña el bosque"
-                size:
-                  type: number
-                  default: 90
-                bedroom:
-                  type: number
-                  default: 3
-                bathroom:
-                  type: number
-                  default: 2
-                capacity:
-                  type: number
-                  default: 6
-                wifi:
-                  type: boolean
-                  default: true
+                hotel: { type: string, example: "cabaña el bosque" }
+                size: { type: number, example: 90 }
+                bedroom: { type: number, example: 3 }
+                bathroom: { type: number, example: 2 }
+                capacity: { type: number, example: 6 }
+                wifi: { type: boolean, example: true }
                 season:
                   type: object
                   required: [high, medium, low]
                   properties:
-                    high:
-                      type: number
-                      default: 130000
-                    medium:
-                      type: number
-                      default: 100000
-                    low:
-                      type: number
-                      default: 75000
+                    high: { type: number, example: 130000 }
+                    medium: { type: number, example: 100000 }
+                    low: { type: number, example: 75000 }
       responses:
         '200':
           description: Lodge actualizado con éxito.
         '400':
-          description: Error en los datos.
+          description: Datos inválidos.
         '404':
-          description: Lodge no existe.
+          description: Lodge no encontrado.
         '500':
-          description: Error interno.
+          description: Error del servidor.
 
     patch:
       summary: Agregar imagen al lodge
@@ -199,13 +149,13 @@ paths:
                   example: "https://url.com/imagen.jpg"
       responses:
         '200':
-          description: Imagen agregada.
+          description: Imagen agregada con éxito.
         '400':
-          description: Falta el campo `image`.
+          description: Faltan campos.
         '404':
-          description: Lodge no existe.
+          description: Lodge no encontrado.
         '500':
-          description: Error interno.
+          description: Error del servidor.
 
     delete:
       summary: Eliminar lodge por ID
@@ -218,9 +168,9 @@ paths:
           schema: { type: string }
       responses:
         '200':
-          description: Lodge eliminado.
+          description: Lodge eliminado con éxito.
         '404':
-          description: Lodge no existe.
+          description: Lodge no encontrado.
         '500':
           description: Error del servidor.
 
@@ -236,15 +186,15 @@ paths:
           schema: { type: string }
       responses:
         '200':
-          description: Imágenes eliminadas.
+          description: Imágenes eliminadas con éxito.
         '404':
-          description: Lodge no existe.
+          description: Lodge no encontrado.
         '500':
           description: Error del servidor.
 
   /api/lodges/available/{id}:
     patch:
-      summary: Cambiar estado de disponibilidad
+      summary: Cambiar disponibilidad de lodge
       tags:
         - Lodges
       parameters:
@@ -254,8 +204,65 @@ paths:
           schema: { type: string }
       responses:
         '200':
-          description: Disponibilidad cambiada.
+          description: Disponibilidad cambiada con éxito.
         '404':
-          description: Lodge no existe.
+          description: Lodge no encontrado.
+        '500':
+          description: Error del servidor.
+
+  /api/lodges/{userId}:
+    post:
+      summary: Crear lodge asociado a un usuario
+      description: Crea un nuevo lodge para el usuario dado.
+      tags:
+        - Lodges
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [hotel, size, bedroom, bathroom, capacity, season]
+              properties:
+                hotel: { type: string, example: "cabaña el sol" }
+                size: { type: number, example: 80 }
+                bedroom: { type: number, example: 3 }
+                bathroom: { type: number, example: 2 }
+                capacity: { type: number, example: 6 }
+                season:
+                  type: object
+                  required: [high, medium, low]
+                  properties:
+                    high: { type: number, example: 120000 }
+                    medium: { type: number, example: 95000 }
+                    low: { type: number, example: 75000 }
+      responses:
+        '201':
+          description: Lodge creado con éxito.
+        '400':
+          description: Datos inválidos.
+        '500':
+          description: Error del servidor.
+
+  /api/lodges/user/{userId}:
+    get:
+      summary: Obtener todos los lodges de un usuario
+      tags:
+        - Lodges
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Lista de lodges del usuario.
+        '400':
+          description: El userId no existe.
         '500':
           description: Error del servidor.
