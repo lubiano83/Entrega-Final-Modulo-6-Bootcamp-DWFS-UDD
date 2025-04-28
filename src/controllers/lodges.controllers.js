@@ -83,6 +83,7 @@ export default class LodgesControllers {
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
             const { image } = req.body;
             if(!image) return res.status(400).send({ message: "El campo image es requerido.." });
+            if(lodge.image.length >= 5) return res.status(400).send({ message: "Has alcanzado el maximo de imagenes permitidas.." });
             lodge.image.push(image);
             await lodgesDao.updateById(id, { image: lodge.image });
             return res.status(200).send({ message: "Imagen agregada con exito.." });
