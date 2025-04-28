@@ -133,7 +133,6 @@ export default class LodgesControllers {
             const { hotel, size, bedroom, bathroom, capacity, season } = req.body;
             const { high, medium, low } = season;
             if(!hotel || !size || !bedroom || !bathroom || !capacity || !high || !medium || !low) return res.status(400).send({ message: "Todos los campos son requeridos.." });
-            if(typeof updatedWifi !== "boolean") return res.status(400).send({ message: "El campo wifi debe ser true o false.." });
             const updatedLodge = { hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), season: { high: Number(high), medium: Number(medium), low: Number(low) }};
             if(isNaN(Number(size)) || isNaN(Number(bedroom)) || isNaN(Number(bathroom)) || isNaN(Number(capacity)) || isNaN(Number(high)) || isNaN(Number(medium)) || isNaN(Number(low))) return res.status(400).send({ message: "El campo: size, bedrrom, bathrrom, capacity, high, medium, low, deben ser tipo numero.." });
             await lodgesDao.updateById(id, updatedLodge);
