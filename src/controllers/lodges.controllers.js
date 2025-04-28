@@ -130,15 +130,27 @@ export default class LodgesControllers {
             const { id } = req.params;
             const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
-            const { hotel, size, bedroom, bathroom, capacity, wifi, season } = req.body;
+            const { hotel, size, bedroom, bathroom, capacity, season } = req.body;
             const { high, medium, low } = season;
-            if(!hotel || !size || !bedroom || !bathroom || !capacity || !wifi || !high || !medium || !low) return res.status(400).send({ message: "Todos los campos son requeridos.." });
-            const updatedWifi = String(wifi).toLowerCase().trim() === "true" ? true : String(wifi).toLowerCase().trim() === "false" ? false : wifi;
+            if(!hotel || !size || !bedroom || !bathroom || !capacity || !high || !medium || !low) return res.status(400).send({ message: "Todos los campos son requeridos.." });
             if(typeof updatedWifi !== "boolean") return res.status(400).send({ message: "El campo wifi debe ser true o false.." });
-            const updatedLodge = { hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), wifi: updatedWifi, season: { high: Number(high), medium: Number(medium), low: Number(low) }};
+            const updatedLodge = { hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), season: { high: Number(high), medium: Number(medium), low: Number(low) }};
             if(isNaN(Number(size)) || isNaN(Number(bedroom)) || isNaN(Number(bathroom)) || isNaN(Number(capacity)) || isNaN(Number(high)) || isNaN(Number(medium)) || isNaN(Number(low))) return res.status(400).send({ message: "El campo: size, bedrrom, bathrrom, capacity, high, medium, low, deben ser tipo numero.." });
             await lodgesDao.updateById(id, updatedLodge);
             return res.status(200).send({ message: "Lodge actualizado con exito.." });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
+    changeWifiById = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const lodge = await lodgesDao.getById(id);
+            if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
+            const changeWifi = { wifi: !lodge.wifi };
+            await lodgesDao.updateById(id, changeWifi);
+            return res.status(200).send({ message: "Wifi cambiado con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
