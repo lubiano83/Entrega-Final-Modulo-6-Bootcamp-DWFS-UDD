@@ -116,6 +116,8 @@ export default class LodgesControllers {
           }
           lodge.image = [];
           await lodgesDao.updateById(id, { image: lodge.image });
+          const changeAvailable = { available: false };
+          await lodgesDao.updateById(id, changeAvailable);
           return res.status(200).send({ message: "Imágenes eliminadas con éxito.." });
         } catch (error) {
           console.error("Error eliminando imágenes:", error.message);
