@@ -1,5 +1,6 @@
 import LodgesDao from "../dao/lodges.dao.js";
 import UsersDao from "../dao/users.dao.js";
+import { bucket } from "../config/firebase.config.js";
 
 const lodgesDao = new LodgesDao();
 const usersDao = new UsersDao();
@@ -76,32 +77,49 @@ export default class LodgesControllers {
         }
     };
 
-    addImageToLodge = async(req, res) => {
+    addImageToLodge = async (req, res) => {
         try {
-            const { id } = req.params;
-            const lodge = await lodgesDao.getById(id);
-            if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
-            const { image } = req.body;
-            if(!image) return res.status(400).send({ message: "El campo image es requerido.." });
-            if(lodge.image.length >= 5) return res.status(400).send({ message: "Has alcanzado el maximo de imagenes permitidas.." });
-            lodge.image.push(image);
+          const { id } = req.params;
+          const lodge = await lodgesDao.getById(id);
+          if (!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
+          if (!req.file) return res.status(400).send({ message: "No se ha subido ninguna imagen.." });
+          if (lodge.image.length >= 5) return res.status(400).send({ message: "Has alcanzado el máximo de imágenes permitidas.." });
+          const fileName = `lodges/${id}/${Date.now()}-${req.file.originalname}`;
+          const file = bucket.file(fileName);
+          const stream = file.createWriteStream({ metadata: { contentType: "image/webp" }});
+          stream.end(req.file.buffer);
+          stream.on("error", (err) => {
+            console.error("Error al subir la imagen:", err);
+            return res.status(500).send({ message: "Error al subir imagen a Firebase.", error: err.message });
+          });
+          stream.on("finish", async () => {
+            await file.makePublic();
+            const publicUrl = `https://storage.googleapis.com/${bucket.name}/${file.name}`;
+            lodge.image.push(publicUrl);
             await lodgesDao.updateById(id, { image: lodge.image });
-            return res.status(200).send({ message: "Imagen agregada con exito.." });
+            return res.status(200).send({ message: "Imagen agregada con éxito.", imageUrl: publicUrl });
+          });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
-    };
+    };      
 
-    deleteAllImageFromLodge = async(req, res) => {
+    deleteAllImageFromLodge = async (req, res) => {
         try {
-            const { id } = req.params;
-            const lodge = await lodgesDao.getById(id);
-            if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
-            lodge.image = [];
-            await lodgesDao.updateById(id, { image: lodge.image });
-            return res.status(200).send({ message: "Imagenes eliminadas con exito.." });
+          const { id } = req.params;
+          const lodge = await lodgesDao.getById(id);
+          if (!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
+          const [files] = await bucket.getFiles({ prefix: `lodges/${id}/` });
+          if (files.length > 0) {
+            const deletePromises = files.map(file => file.delete());
+            await Promise.all(deletePromises);
+          }
+          lodge.image = [];
+          await lodgesDao.updateById(id, { image: lodge.image });
+          return res.status(200).send({ message: "Imágenes eliminadas con éxito.." });
         } catch (error) {
-            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+          console.error("Error eliminando imágenes:", error.message);
+          return res.status(500).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
     };
 
