@@ -163,6 +163,13 @@ export default class LodgesControllers {
             const { id } = req.params;
             const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
+            const [files] = await bucket.getFiles({ prefix: `lodges/${id}/` });
+            if (files.length > 0) {
+                const deletePromises = files.map(file => file.delete());
+                await Promise.all(deletePromises);
+            }
+            lodge.image = [];
+            await lodgesDao.updateById(id, { image: lodge.image });
             await lodgesDao.deleteById(id);
             return res.status(200).send({ message: "Lodge eliminado con exito.." });
         } catch (error) {
