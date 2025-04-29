@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import moment from "moment";
 import paginate from "mongoose-paginate-v2";
 
 const collection = "users";

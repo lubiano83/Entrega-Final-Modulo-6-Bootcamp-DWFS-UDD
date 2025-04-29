@@ -130,6 +130,8 @@ export default class ReservationsController {
             const emailResponse = await sendReservationEmail(modifiedData);
             if (!emailResponse.success) return res.status(500).send({ message: "Reserva creada, pero hubo un error al enviar el email.", error: emailResponse.error });
             const reservation = await reservationsDao.create(modifiedData);
+            console.log(reservation._id)
+            await lodgesDao.updateById(lodgeId, {$push: { reservations: reservation._id }});
             await usersDao.updateById(userId, {$push: { reservations: reservation._id }});
             return res.status(201).send({ message: "Reserva creada con éxito.." });
         } catch (error) {

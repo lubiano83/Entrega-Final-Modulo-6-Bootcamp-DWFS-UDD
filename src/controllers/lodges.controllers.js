@@ -75,6 +75,12 @@ export default class LodgesControllers {
             if(user.plan === "free" && user.lodges.length < 1) {
                 const lodge = await lodgesDao.create(lodgeCreated);
                 await usersDao.updateById(userId, {$push: { lodges: lodge._id }});
+            } else if(user.plan === "premium" && user.lodges.length < 5) {
+                const lodge = await lodgesDao.create(lodgeCreated);
+                await usersDao.updateById(userId, {$push: { lodges: lodge._id }});
+            } else if (user.plan === "gold" && user.lodges.length < 10) {
+                const lodge = await lodgesDao.create(lodgeCreated);
+                await usersDao.updateById(userId, {$push: { lodges: lodge._id }});
             } else {
                 return res.status(400).send({ message: `Alcanzaste el maximo de cabañas que puedes crear con tu cuenta ${user.plan}..` });
             };

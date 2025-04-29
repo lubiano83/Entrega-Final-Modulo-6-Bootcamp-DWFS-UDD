@@ -57,7 +57,7 @@ export default class LodgesDao {
             if ( !isValidId( id )) throw new Error("ID no válido..");
             const lodge = await this.getById( id );
             if ( !lodge ) throw new Error("No encontrado..");
-            return await LodgeModel.findByIdAndUpdate( id, { $set: doc }, { new: true });
+            return await LodgeModel.findByIdAndUpdate(id, doc, { new: true });
         } catch ( error ) {
             throw new Error( "Hubo un error en el servidor..", error.message );
         }

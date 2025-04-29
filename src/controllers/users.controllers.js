@@ -1,9 +1,9 @@
 import UsersDao from "../dao/users.dao.js";
-import SessionsDao from "../dao/sessions.dao.js";
+import LodgesDao from "../dao/lodges.dao.js";
 import { bucket } from "../config/firebase.config.js";
 
 const usersDao = new UsersDao();
-const sessionsDao = new SessionsDao();
+const lodgesDao = new LodgesDao();
 
 export default class UsersControllers {
 
@@ -152,7 +152,12 @@ export default class UsersControllers {
             const { id } = req.params;
             const user = await usersDao.getById(id);
             if (!user) return res.status(404).send({ message: "Ese usuario no existe.." });
-            if (user.image && user.image.includes("storage.googleapis.com") && !user.image.includes("https://firebasestorage.googleapis.com/v0/b/portfolio-3e2be.appspot.com/o/lasTrancasLodges%2Fprofile-pic.webp?alt=media&token=a725178d-14bf-4ad6-bfb8-726189431331")) {
+            if(user.reservations.length > 0) return res.status(400).send({ message: "No puedes eliminar un usuario con reservas activas.." });
+            await Promise.all(
+                user.lodges.map(lodge => lodge && lodgesDao.deleteById(String(lodge)))
+            );
+            await usersDao.updateById(user._id, { lodges: [] });
+            if (user.image && user.image.includes("storage.googleapis.com")) {
                 try {
                     const imageUrl = new URL(user.image);
                     const pathInBucket = imageUrl.pathname.replace(`/${bucket.name}/`, "");
@@ -175,7 +180,7 @@ export default class UsersControllers {
     
             for (const user of users) {
                 if (
-                    user.image && user.image.includes("firebasestorage.googleapis.com") && !user.image.includes("https://firebasestorage.googleapis.com/v0/b/portfolio-3e2be.appspot.com/o/lasTrancasLodges%2Fprofile-pic.webp?alt=media&token=a725178d-14bf-4ad6-bfb8-726189431331")
+                    user.image && user.image.includes("firebasestorage.googleapis.com")
                 ) {
                     try {
                         const imageUrl = new URL(user.image);

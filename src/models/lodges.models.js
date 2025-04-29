@@ -61,7 +61,13 @@ const lodgeSchema = new mongoose.Schema({
     available: {
         type: Boolean,
         default: false
-    }
+    },
+    reservations: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "reservations"
+        }
+    ],
 });
 
 lodgeSchema.plugin(paginate);
