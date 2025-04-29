@@ -68,9 +68,16 @@ export default class LodgesControllers {
             const { hotel, size, bedroom, bathroom, capacity, season } = req.body;
             const { high, medium, low } = season;
             if(!userId, !hotel || !size || !bedroom || !bathroom || !capacity || !high || !medium || !low) return res.status(400).send({ message: "Todos los campos son requeridos.." });
+            const user = await usersDao.getById(userId);
+            if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
             const lodgeCreated = { userId: String(userId), hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), season: { high: Number(high), medium: Number(medium), low: Number(low) } };
             if(isNaN(Number(size)) || isNaN(Number(bedroom)) || isNaN(Number(bathroom)) || isNaN(Number(capacity)) || isNaN(Number(high)) || isNaN(Number(medium)) || isNaN(Number(low))) return res.status(400).send({ message: "El campo: size, bedrrom, bathrrom, capacity, high, medium, low, deben ser tipo numero.." });
-            await lodgesDao.create(lodgeCreated);
+            if(user.plan === "free" && user.lodges.length < 1) {
+                const lodge = await lodgesDao.create(lodgeCreated);
+                await usersDao.updateById(userId, {$push: { lodges: lodge._id }});
+            } else {
+                return res.status(400).send({ message: `Alcanzaste el maximo de cabañas que puedes crear con tu cuenta ${user.plan}..` });
+            };
             return res.status(201).send({ message: "Lodge creado con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
@@ -174,6 +181,10 @@ export default class LodgesControllers {
             const { id } = req.params;
             const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
+            const user = await usersDao.getById(lodge.userId);
+            if(!user) return res.status(404).send({ message: "Usuario no encontrado.." });
+            const lodgesModified = user.lodges.filter(lodge => lodge.toString() !== id)
+            await usersDao.updateById(user._id, { lodges: lodgesModified });
             const [files] = await bucket.getFiles({ prefix: `lodges/${id}/` });
             if (files.length > 0) {
                 const deletePromises = files.map(file => file.delete());

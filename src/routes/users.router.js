@@ -14,6 +14,7 @@ ROUTER.put("/:id", usersController.updateUserById);
 ROUTER.delete("/:id", usersController.deleteUserById);
 ROUTER.patch("/image/:id", uploadProfile.single("image"), convertToWebp, usersController.changeImageById);
 ROUTER.patch("/role/:id", usersController.changeRoleById);
+ROUTER.patch("/plan/:id", usersController.changePlanById);
 ROUTER.delete("/delete/all", usersController.deleteAllUsers);
 
 export default ROUTER;

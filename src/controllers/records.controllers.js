@@ -57,7 +57,7 @@ export default class RecordsControllers {
             const record = await recordsDao.getById(id);
             if(!record) return res.status(404).send({ message: "Registro no encontrado.." });
             await recordsDao.deleteById(id);
-            return res.status(200).send({ message: "Registro eliminado.." });
+            return res.status(200).send({ message: "Registro eliminado con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
@@ -66,7 +66,7 @@ export default class RecordsControllers {
     deleteAllRecords = async(req, res) => {
         try {
             await recordsDao.deleteAll();
-            return res.status(200).send({ message: "Todos los registros eliminados.." });
+            return res.status(200).send({ message: "Todos los registros eliminados con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }

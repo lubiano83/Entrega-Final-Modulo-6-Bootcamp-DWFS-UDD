@@ -7,7 +7,7 @@ const collection = "users";
 const userSchema = new mongoose.Schema({
     image: {
         type: String,
-        default: "https://firebasestorage.googleapis.com/v0/b/portfolio-3e2be.appspot.com/o/lasTrancasLodges%2Fprofile-pic.webp?alt=media&token=a725178d-14bf-4ad6-bfb8-726189431331"
+        default: ""
     },
     first_name: {
         type: String,
@@ -47,12 +47,23 @@ const userSchema = new mongoose.Schema({
         enum: [ "user", "admin", "developer" ],
         default: "user"
     },
+    lodges: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "lodges"
+        }
+    ],
     reservations: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "reservations"
         }
     ],
+    plan: {
+        type: String,
+        enum: [ "free", "premium", "gold" ],
+        default: "free"
+    },
     createdAt: {
         type: Date,
         default: Date.now,

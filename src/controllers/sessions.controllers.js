@@ -113,4 +113,13 @@ export default class SessionsControllers {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
     };
+
+    deleteAllSessions = async(req, res) => {
+        try {
+            await sessionsDao.deleteAll();
+            return res.status(200).send({ message: "Todas las sesiones eliminadas con exito.." });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
 };

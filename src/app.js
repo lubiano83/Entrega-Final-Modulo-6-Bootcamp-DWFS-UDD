@@ -11,7 +11,6 @@ import cookieParser from "cookie-parser";
 import passport from "passport";
 import initializePassport from "./config/passport.config.js";
 import dotenv from "dotenv";
-import path from "path";
 
 // Variables
 dotenv.config();
@@ -29,13 +28,10 @@ APP.use(express.json());
 APP.use(express.urlencoded({ extended: true }));
 APP.use(cookieParser());
 APP.use(passport.initialize());
-initializePassport();
-
-// Servir imágenes desde la carpeta public
-APP.use("/", express.static(path.join(process.cwd(), "src/public")));
+initializePassport()
 
 // Rutas
-APP.get("/", (req, res) => res.send(`<h1>Este es nuestro backend de un sistema de reservas!!</h1> <h3>Para obtener mas información, ingresa a nuestra documentación con Swagger..</h3>  <a href="/api/docs" target="_blank"><button>Swagger</button></a>`));
+APP.get("/", (req, res) => res.send(`<h1>Este es nuestro backend de un sistema de reservas!!</h1> <h3>Para obtener mas información, ingresa a nuestra documentación con Swagger.. <span><a href="/api/docs" target="_blank"><button>Swagger</button></a></span></h3> <div> <a href="/api/users" target="_blank"><button>Users</button></a> <a href="/api/sessions" target="_blank"><button>Sessions</button></a> <a href="/api/seasons" target="_blank"><button>Seasons</button></a> <a href="/api/lodges" target="_blank"><button>Lodges</button></a> <a href="/api/reservations" target="_blank"><button>Reservations</button></a> <a href="/api/records" target="_blank"><button>Records</button></a> </div> `));
 APP.use("/api/users", usersRouter);
 APP.use("/api/sessions", sessionsRouter);
 APP.use("/api/seasons", seasonsRouter);

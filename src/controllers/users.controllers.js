@@ -126,9 +126,26 @@ export default class UsersControllers {
             await usersDao.updateById(id, modifiedRole);
             return res.status(200).send({ message: "Role actualizado con exito.." });
         } catch (error) {
-            return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
+            return res.status(500).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
-    }; 
+    };
+
+    changePlanById = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const { plan } = req.body;
+            const user = await usersDao.getById(id);
+            if(!user) return res.status(404).send({ message: "Ese usuario no existe.." });
+            const newPlan = plan.toLowerCase().trim();
+            const validPlan = ["free", "premium", "gold"];
+            if (!validPlan.includes(newPlan)) return res.status(400).send({ message: "Ese plan no está habilitado.." });
+            const modifiedPlan = { plan: newPlan.toLowerCase().trim() };
+            await usersDao.updateById(id, modifiedPlan);
+            return res.status(200).send({ message: "Plan actualizado con exito.." });
+        } catch (error) {
+            return res.status(500).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
 
     deleteUserById = async (req, res) => {
         try {
@@ -148,7 +165,7 @@ export default class UsersControllers {
             await usersDao.deleteById(id);
             return res.status(200).send({ message: "Usuario eliminado con éxito.." });
         } catch (error) {
-          return res.status(500).send({ message: "Error al eliminar el usuario.", error: error.message });
+            return res.status(500).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
     };
           
@@ -173,9 +190,9 @@ export default class UsersControllers {
             }
     
             await usersDao.deleteAll();
-            return res.status(200).send({ message: "Todos los usuarios e imágenes fueron eliminados con éxito." });
+            return res.status(200).send({ message: "Todos los usuarios e imágenes fueron eliminados con éxito.." });
         } catch (error) {
-            return res.status(500).send({ message: "Error al obtener datos desde el servidor.", error: error.message });
+            return res.status(500).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
     };
     

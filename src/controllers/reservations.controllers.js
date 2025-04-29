@@ -171,7 +171,7 @@ export default class ReservationsController {
     deleteAllReservations = async(req, res) => {
         try {
             await reservationsDao.deleteAll();
-            return res.status(200).send({ message: "Todas las reservas eliminadas.." });
+            return res.status(200).send({ message: "Todas las reservas eliminadas con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }

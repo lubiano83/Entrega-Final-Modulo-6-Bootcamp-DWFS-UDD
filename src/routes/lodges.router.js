@@ -6,7 +6,6 @@ const ROUTER = Router();
 const lodgesControllers = new LodgesControllers();
 
 ROUTER.get("/", lodgesControllers.getLodges);
-ROUTER.delete("/", lodgesControllers.deleteAllLodges);
 ROUTER.post("/:userId", lodgesControllers.createLodge);
 ROUTER.get("/:id", lodgesControllers.getLodgeById);
 ROUTER.put("/:id",lodgesControllers.updateLogdeById);
@@ -16,5 +15,6 @@ ROUTER.delete("/image/:id", lodgesControllers.deleteAllImageFromLodge);
 ROUTER.patch("/wifi/:id", lodgesControllers.changeWifiById);
 ROUTER.patch("/available/:id", lodgesControllers.changeAvailableById);
 ROUTER.get("/user/:userId", lodgesControllers.getLodgesByUserId);
+ROUTER.delete("/delete/all", lodgesControllers.deleteAllLodges);
 
 export default ROUTER;
