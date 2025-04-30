@@ -74,7 +74,7 @@ export default class LodgesControllers {
             if(isNaN(Number(size)) || isNaN(Number(bedroom)) || isNaN(Number(bathroom)) || isNaN(Number(capacity)) || isNaN(Number(high)) || isNaN(Number(medium)) || isNaN(Number(low))) return res.status(400).send({ message: "El campo: size, bedrrom, bathrrom, capacity, high, medium, low, deben ser tipo numero.." });
             if(user.plan === "free" && user.lodges.length < 1) {
                 const lodge = await lodgesDao.create(lodgeCreated);
-                await usersDao.updateById(userId, {$push: { lodges: lodge._id }});
+                await usersDao.updateById(userId, {$push: { lodges: lodge._id}});
             } else if(user.plan === "premium" && user.lodges.length < 5) {
                 const lodge = await lodgesDao.create(lodgeCreated);
                 await usersDao.updateById(userId, {$push: { lodges: lodge._id }});
