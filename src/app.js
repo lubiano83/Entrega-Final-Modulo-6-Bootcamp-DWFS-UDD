@@ -19,7 +19,7 @@ const PORT = 8080;
 const HOST = "localhost";
 
 APP.use(cors({
-    origin: "http://localhost:5173",
+    origin: [ "http://localhost:5173", "https://las-trancas-lodges.netlify.app/" ],
     credentials: true
 }));
 
