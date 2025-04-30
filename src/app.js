@@ -18,10 +18,23 @@ const APP = express();
 const PORT = 8080;
 const HOST = "localhost";
 
+// Paginas
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://las-trancas-lodges.netlify.app"
+];
+  
+// Cors
 APP.use(cors({
-    origin: [ "http://localhost:5173", "https://las-trancas-lodges.netlify.app/" ],
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("No permitido por CORS"));
+      }
+    },
     credentials: true
-}));
+}));  
 
 // Middlewares
 APP.use(express.json());
