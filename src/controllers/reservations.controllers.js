@@ -114,10 +114,9 @@ export default class ReservationsController {
     getReservationsByUserId = async(req, res) => {
         try {
             const { userId } = req.params;
-            const user = await usersDao.getById(userId);
-            if(!user) return res.status(400).send({ message: "El id del usuario ingresado no existe.." });
-            const reservations = await reservationsDao.getByProperty({ user: userId });
-            return res.status(200).send({ message: "Todas las reservas por el id del usuario..", payload: reservations });
+            const reservations = await reservationsDao.gets();
+            const reservationsFiltered = reservations.filter(item => String(item.lodge.userId) === userId);
+            return res.status(200).send({ message: "Todas las reservas por el id del usuario..", payload: reservationsFiltered });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }

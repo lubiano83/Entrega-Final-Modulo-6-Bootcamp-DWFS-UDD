@@ -20,6 +20,7 @@ export const sendReservationEmail = async (reservation) => {
                         <p><strong>Cabaña:</strong> ${reservation.lodge}</p>
                         <p><strong>Personas:</strong> ${reservation.people}</p>
                         <p><strong>Total a pagar:</strong> $${reservation.price}</p>
+                        <p><strong>Contaco:</strong> ${reservation.contact}</p>
                     </div>
                     <p>Gracias por elegirnos. ¡Esperamos verte pronto!</p>
                 </div>
