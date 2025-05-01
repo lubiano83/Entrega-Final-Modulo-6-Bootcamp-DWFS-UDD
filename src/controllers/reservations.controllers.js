@@ -130,12 +130,14 @@ export default class ReservationsController {
             if(!user) return res.status(404).send({ message: "Usuario no econtrado.." });
             const lodge = await lodgesDao.getById(lodgeId);
             if(!lodge) return res.status(404).send({ message: "Cabaña no econtrada.." });
+            const lodgeOwner = await usersDao.getById(lodge.userId);
+            if(!lodgeOwner) return res.status(404).send({ message: "Dueño de la cabaña no encontrado.." });
             const { people, arrive, leave } = req.body;
             if( !people || !arrive || !leave ) return res.status(400).send({ message: "Todos los campos son requeridos.." });
             const regex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
             if (!regex.test(arrive) || !regex.test(leave)) return res.status(400).send({ message: "Las fechas deben ser en formato: YYYY-MM-DD" });
             let price = await this.#calculateTotalPrice(arrive, leave, lodgeId);
-            const modifiedData = { user: userId, lodge: lodgeId, name: `${user.first_name} ${user.last_name}`, email: user.email, people: Number(people), arrive: new Date(arrive), leave: new Date(leave), price: Number(price), paid: false };
+            const modifiedData = { user: userId, lodge: lodgeId, name: `${user.first_name} ${user.last_name}`, contact: lodgeOwner.email, email: user.email, people: Number(people), arrive: new Date(arrive), leave: new Date(leave), price: Number(price), paid: false };
             if( isNaN(Number(people))) return res.status(400).send({ message: "El campo: people, debe ser tipo number.." });
             if(people < 1 || people > lodge.capacity) return res.status(400).send({ message: `Ese lodge tiene una capacidad maxima entre 1 y ${lodge.capacity} personas` });
             if(lodge.available === false) return res.status(400).send({ message: "Esa cabaña no esta disponible.." });
@@ -145,7 +147,6 @@ export default class ReservationsController {
             const emailResponse = await sendReservationEmail(modifiedData);
             if (!emailResponse.success) return res.status(500).send({ message: "Reserva creada, pero hubo un error al enviar el email.", error: emailResponse.error });
             const reservation = await reservationsDao.create(modifiedData);
-            console.log(reservation._id)
             await lodgesDao.updateById(lodgeId, {$push: { reservations: reservation._id }});
             await usersDao.updateById(userId, {$push: { reservations: reservation._id }});
             return res.status(201).send({ message: "Reserva creada con éxito.." });

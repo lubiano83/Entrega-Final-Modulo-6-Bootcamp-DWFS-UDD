@@ -33,6 +33,10 @@ const reservationSchema = new mongoose.Schema({
     paid: {
         type: Boolean,
         default: false
+    },
+    contact: {
+        type: String,
+        required: true
     }
 });
 
