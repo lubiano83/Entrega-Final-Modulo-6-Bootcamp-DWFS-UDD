@@ -54,7 +54,7 @@ export default class LodgesControllers {
         try {
             const { userId } = req.params;
             const user = await usersDao.getById(userId);
-            if(!user) return res.status(400).send({ message: "El userId ingresado no existe.." });
+            if(!user) return res.status(400).send({ message: "El id del usuario ingresado no existe.." });
             const lodges = await lodgesDao.getByProperty({ userId: userId });
             return res.status(200).send({ message: "Todos los lodges por el userId..", payload: lodges });
         } catch (error) {
