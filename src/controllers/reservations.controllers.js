@@ -116,14 +116,14 @@ export default class ReservationsController {
             const { userId, lodgeId } = req.params;
             const user = await usersDao.getById(userId);
             if(!user) return res.status(404).send({ message: "Usuario no econtrado.." });
-            const { people, arrive, leave } = req.body;
-            if( !people || !arrive || !leave ) return res.status(400).send({ message: "Todos los campos son requeridos.." });
             const lodge = await lodgesDao.getById(lodgeId);
             if(!lodge) return res.status(404).send({ message: "Cabaña no econtrada.." });
-            let price = await this.#calculateTotalPrice(arrive, leave, lodgeId);
-            const modifiedData = { user: userId, lodge: lodgeId, name: `${user.first_name} ${user.last_name}`, email: user.email, people: Number(people), arrive: String(new Date(arrive)), leave: String(new Date(leave)), price: Number(price), paid: false };
+            const { people, arrive, leave } = req.body;
+            if( !people || !arrive || !leave ) return res.status(400).send({ message: "Todos los campos son requeridos.." });
             const regex = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
             if (!regex.test(arrive) || !regex.test(leave)) return res.status(400).send({ message: "Las fechas deben ser en formato: YYYY-MM-DD" });
+            let price = await this.#calculateTotalPrice(arrive, leave, lodgeId);
+            const modifiedData = { user: userId, lodge: lodgeId, name: `${user.first_name} ${user.last_name}`, email: user.email, people: Number(people), arrive: String(new Date(arrive)), leave: String(new Date(leave)), price: Number(price), paid: false };
             if( isNaN(Number(people))) return res.status(400).send({ message: "El campo: people, debe ser tipo number.." });
             if(people < 1 || people > lodge.capacity) return res.status(400).send({ message: `Ese lodge tiene una capacidad maxima entre 1 y ${lodge.capacity} personas` });
             if(lodge.available === false) return res.status(400).send({ message: "Esa cabaña no esta disponible.." });
