@@ -122,6 +122,7 @@ export default class ReservationsController {
             if(!lodge) return res.status(404).send({ message: "Cabaña no econtrada.." });
             let price = await this.#calculateTotalPrice(arrive, leave, lodgeId);
             const modifiedData = { user: userId, lodge: lodgeId, name: `${user.first_name} ${user.last_name}`, email: user.email, people: Number(people), arrive: new Date(arrive), leave: new Date(leave), price: Number(price), paid: false };
+            if(people < 1 || people > lodge.capacity) return res.status(400).send({ message: `Ese lodge tiene una capacidad entre 0 y ${lodge.capacity} personas` });
             if( isNaN(Number(people))) return res.status(400).send({ message: "El campo: people, debe ser tipo number.." });
             if(lodge.available === false) return res.status(400).send({ message: "Esa cabaña no esta disponible.." });
             if(modifiedData.people > lodge.capacity) return res.status(400).send({ message: `La capacidad maxima es de ${lodge.capacity} personas..` });
