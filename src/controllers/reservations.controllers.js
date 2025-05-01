@@ -129,6 +129,7 @@ export default class ReservationsController {
             if(!user) return res.status(404).send({ message: "Usuario no econtrado.." });
             const lodge = await lodgesDao.getById(lodgeId);
             if(!lodge) return res.status(404).send({ message: "Cabaña no econtrada.." });
+            if(String(user._id) === String(lodge.userId)) return res.status(400).send({ message: "No puedes reservar una cabaña de tu propiedad.." });
             const lodgeOwner = await usersDao.getById(lodge.userId);
             if(!lodgeOwner) return res.status(404).send({ message: "Dueño de la cabaña no encontrado.." });
             const { people, arrive, leave } = req.body;
