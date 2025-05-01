@@ -111,7 +111,7 @@ export default class ReservationsController {
         }
     };
 
-    getReservationByUserId = async(req, res) => {
+    getReservationsByUserId = async(req, res) => {
         try {
             const { userId } = req.params;
             const user = await usersDao.getById(userId);
