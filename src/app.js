@@ -26,10 +26,11 @@ const allowedOrigins = [
 
 // Cors
 APP.use(cors({
-  origin: (origin, callback) => {
-    if (allowedOrigins.includes(origin)) {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.error("Solicitud bloqueada por CORS desde:", origin);
       callback(new Error("No permitido por CORS"));
     }
   },
@@ -67,4 +68,4 @@ APP.use((error, req, res, next) => {
 });
 
 // Listening
-APP.listen(PORT, () => console.log(`Escuchando en http://${HOST}:${PORT}`));
+APP.listen(PORT, HOST, () => console.log(`Escuchando en http://${HOST}:${PORT}`));
