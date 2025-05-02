@@ -115,7 +115,7 @@ export default class ReservationsController {
         try {
             const { userId } = req.params;
             const reservations = await reservationsDao.gets();
-            const reservationsFiltered = reservations.filter(item => String(item.lodge.userId) === userId);
+            const reservationsFiltered = reservations.filter(reservation => String(reservation.lodge.userId) === userId);
             return res.status(200).send({ message: "Todas las reservas por el id del usuario..", payload: reservationsFiltered });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });

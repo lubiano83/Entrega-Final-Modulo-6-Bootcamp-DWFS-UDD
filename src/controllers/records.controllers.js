@@ -51,6 +51,17 @@ export default class RecordsControllers {
         }
     };
 
+    getRecordsByUserId = async(req, res) => {
+        try {
+            const { userId } = req.params;
+            const records = await recordsDao.gets();
+            const recordsFiltered = records.filter(record => String(record.lodge.userId) === userId);
+            return res.status(200).send({ message: "Registro obtenido por el id..", payload: recordsFiltered });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
     deleteRecordById = async(req, res) => {
         try {
             const { id } = req.params;
