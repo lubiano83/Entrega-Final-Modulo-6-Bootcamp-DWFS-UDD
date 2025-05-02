@@ -60,7 +60,7 @@ export default class SessionsControllers {
             const userLogged = req.cookies[ process.env.COOKIE_NAME ];
             if ( userLogged ) return res.status( 409 ).send({ message: "Ese usuario ya está logeado.." });
             const token = jwt.sign({ id: users[0]._id, email: users[0].email.toLowerCase(), first_name: users[0].first_name.toLowerCase(), last_name: users[0].last_name.toLowerCase(), phone: users[0].phone, role: users[0].role.toLowerCase(), id: users[0]._id.toString() }, process.env.COOKIE_KEY, { expiresIn: "1h" });
-            res.cookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 1000 * 60 * 60 });
+            res.cookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 1000 * 60 * 60, domain: ".onrender.com" });
             await sessionsDao.create(users[0]._id, token);
             return res.status( 200 ).send({ message: "Login realizado con éxito", token });
         } catch ( error ) {
