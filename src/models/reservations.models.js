@@ -43,7 +43,7 @@ const reservationSchema = new mongoose.Schema({
 reservationSchema.plugin(paginate);
 
 reservationSchema.pre(/^find/, function (next) {
-    this.populate("lodge")
+    this.populate("lodge").populate("user");
     next();
 });
 
