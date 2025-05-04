@@ -16,7 +16,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const APP = express();
 const PORT = 8080;
-const HOST = "0.0.0.0";
+const HOST = "localhost";
 
 // Direcciones
 const allowedOrigins = [
@@ -68,4 +68,4 @@ APP.use((error, req, res, next) => {
 });
 
 // Listening
-APP.listen(PORT, HOST, () => console.log(`Escuchando en http://${HOST}:${PORT}`));
+APP.listen(PORT, () => console.log(`Escuchando en http://${HOST}:${PORT}`));

@@ -200,5 +200,4 @@ export default class UsersControllers {
             return res.status(500).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
     };
-    
 };
