@@ -174,6 +174,7 @@ export default class LodgesControllers {
             const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
             if(lodge.image.length === 0) return res.status(400).send({ message: "Debes tener al menos una imagen cargada.." });
+            if(lodge.mapUrl === "") return res.status(400).send({ message: "Primero debes establecer una ubicacion para tu cabaña.." });
             const changeAvailable = { available: !lodge.available };
             await lodgesDao.updateById(id, changeAvailable);
             return res.status(200).send({ message: "Available cambiado con exito.." });
