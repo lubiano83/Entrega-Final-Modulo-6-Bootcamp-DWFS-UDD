@@ -68,6 +68,10 @@ const lodgeSchema = new mongoose.Schema({
             ref: "reservations"
         }
     ],
+    mapUrl: {
+        type: String,
+        default: ""
+    }
 });
 
 lodgeSchema.plugin(paginate);

@@ -21,6 +21,7 @@ export const sendReservationEmail = async (reservation) => {
                         <p><strong>Personas:</strong> ${reservation.people}</p>
                         <p><strong>Total a pagar:</strong> $${reservation.price}</p>
                         <p><strong>Contaco:</strong> ${reservation.contact}</p>
+                        <p><strong>Ubicación:</strong><a href="${reservation.mapUrl}" target="_blank" style="color: #1a73e8; text-decoration: none;"> Ver en Google Maps</a></p>
                     </div>
                     <p>Gracias por elegirnos. ¡Esperamos verte pronto!</p>
                 </div>

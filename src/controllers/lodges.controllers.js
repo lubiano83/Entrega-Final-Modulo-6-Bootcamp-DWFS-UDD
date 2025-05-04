@@ -143,10 +143,10 @@ export default class LodgesControllers {
             const { id } = req.params;
             const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
-            const { hotel, size, bedroom, bathroom, capacity, season } = req.body;
+            const { hotel, size, bedroom, bathroom, capacity, season, mapUrl } = req.body;
             const { high, medium, low } = season;
-            if(!hotel || !size || !bedroom || !bathroom || !capacity || !high || !medium || !low) return res.status(400).send({ message: "Todos los campos son requeridos.." });
-            const updatedLodge = { hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), season: { high: Number(high), medium: Number(medium), low: Number(low) }};
+            if(!hotel || !size || !bedroom || !bathroom || !capacity || !high || !medium || !low || !mapUrl) return res.status(400).send({ message: "Todos los campos son requeridos.." });
+            const updatedLodge = { hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), season: { high: Number(high), medium: Number(medium), low: Number(low) }, mapUrl: String(mapUrl) };
             if(isNaN(Number(size)) || isNaN(Number(bedroom)) || isNaN(Number(bathroom)) || isNaN(Number(capacity)) || isNaN(Number(high)) || isNaN(Number(medium)) || isNaN(Number(low))) return res.status(400).send({ message: "El campo: size, bedrrom, bathrrom, capacity, high, medium, low, deben ser tipo numero.." });
             await lodgesDao.updateById(id, updatedLodge);
             return res.status(200).send({ message: "Lodge actualizado con exito.." });
