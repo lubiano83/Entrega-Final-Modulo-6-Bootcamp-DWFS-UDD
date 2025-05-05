@@ -1,11 +1,13 @@
 import LodgesDao from "../dao/lodges.dao.js";
 import UsersDao from "../dao/users.dao.js";
 import ReservationsDao from "../dao/reservations.dao.js";
+import RecordsDao from "../dao/records.dao.js";
 import { bucket } from "../config/firebase.config.js";
 
 const lodgesDao = new LodgesDao();
 const usersDao = new UsersDao();
 const reservationsDao = new ReservationsDao();
+const recordsDao = new RecordsDao();
 
 export default class LodgesControllers {
 
@@ -190,6 +192,8 @@ export default class LodgesControllers {
             const { id } = req.params;
             const activeReservations = await reservationsDao.getByProperty({ lodge: id, paid: false });
             if (activeReservations.length > 0) return res.status(400).send({ message: "Esa lodge no se puede eliminar porque tiene una reserva activa.." });
+            const activeRecords = await recordsDao.getByProperty({ lodge: id });
+            if (activeRecords.length > 0) return res.status(400).send({ message: "No se puede eliminar: esta cabaña tiene registros de historial." });
             const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
             const user = await usersDao.getById(lodge.userId);
