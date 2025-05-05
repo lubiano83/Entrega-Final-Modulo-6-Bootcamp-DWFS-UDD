@@ -1,9 +1,11 @@
 import LodgesDao from "../dao/lodges.dao.js";
 import UsersDao from "../dao/users.dao.js";
+import ReservationsDao from "../dao/reservations.dao.js";
 import { bucket } from "../config/firebase.config.js";
 
 const lodgesDao = new LodgesDao();
 const usersDao = new UsersDao();
+const reservationsDao = new ReservationsDao();
 
 export default class LodgesControllers {
 
@@ -186,11 +188,13 @@ export default class LodgesControllers {
     deleteLodgeById = async(req, res) => {
         try {
             const { id } = req.params;
+            const activeReservations = await reservationsDao.getByProperty({ lodge: id, paid: false });
+            if (activeReservations.length > 0) return res.status(400).send({ message: "Esa lodge no se puede eliminar porque tiene una reserva activa.." });
             const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
             const user = await usersDao.getById(lodge.userId);
             if(!user) return res.status(404).send({ message: "Usuario no encontrado.." });
-            const lodgesModified = user.lodges.filter(lodge => lodge.toString() !== id)
+            const lodgesModified = user.lodges.filter(lodge => lodge.toString() !== id);
             await usersDao.updateById(user._id, { lodges: lodgesModified });
             const [files] = await bucket.getFiles({ prefix: `lodges/${id}/` });
             if (files.length > 0) {
