@@ -142,15 +142,30 @@ export default class LodgesControllers {
         }
     };
 
+    changeLocation = async(req, res) => {
+        try {
+            const { id } = req.params;
+            const lodge = await lodgesDao.getById(id);
+            if(!lodge) return res.status(404).send({ message: "Cabaña no encontrada.." });
+            const { mapUrl } = req.body;
+            const regex = /^https:\/\/www\.google\.[^/]+\/maps\/place\/\d{1,3}%C2%B0[0-5]?\d+'[\d.]+%22[NS]\+\d{1,3}%C2%B0[0-5]?\d+'[\d.]+%22[EW]\/@-?\d+\.\d+,-?\d+\.\d+,\d+z\/data=.*$/;
+            if(!regex.test(mapUrl)) return res.send({ message: "Debes ingresar una ubicacion de google maps.." });
+            await lodgesDao.updateById(id, { mapUrl: mapUrl });
+            return res.status(200).send({ message: "Ubicacion establcida con exito.." });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
     updateLogdeById = async(req, res) => {
         try {
             const { id } = req.params;
             const lodge = await lodgesDao.getById(id);
             if(!lodge) return res.status(404).send({ message: "Ese lodge no existe.." });
-            const { hotel, size, bedroom, bathroom, capacity, season, mapUrl } = req.body;
+            const { hotel, size, bedroom, bathroom, capacity, season } = req.body;
             const { high, medium, low } = season;
             if(!hotel || !size || !bedroom || !bathroom || !capacity || !high || !medium || !low || !mapUrl) return res.status(400).send({ message: "Todos los campos son requeridos.." });
-            const updatedLodge = { hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), season: { high: Number(high), medium: Number(medium), low: Number(low) }, mapUrl: String(mapUrl) };
+            const updatedLodge = { hotel: hotel.toLowerCase().trim(), size: Number(size), bedroom: Number(bedroom), bathroom: Number(bathroom), capacity: Number(capacity), season: { high: Number(high), medium: Number(medium), low: Number(low) } };
             if(isNaN(Number(size)) || isNaN(Number(bedroom)) || isNaN(Number(bathroom)) || isNaN(Number(capacity)) || isNaN(Number(high)) || isNaN(Number(medium)) || isNaN(Number(low))) return res.status(400).send({ message: "El campo: size, bedrrom, bathrrom, capacity, high, medium, low, deben ser tipo numero.." });
             await lodgesDao.updateById(id, updatedLodge);
             return res.status(200).send({ message: "Lodge actualizado con exito.." });

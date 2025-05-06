@@ -14,6 +14,7 @@ ROUTER.delete("/:id", lodgesControllers.deleteLodgeById);
 ROUTER.delete("/image/:id", lodgesControllers.deleteAllImageFromLodge);
 ROUTER.patch("/wifi/:id", lodgesControllers.changeWifiById);
 ROUTER.patch("/available/:id", lodgesControllers.changeAvailableById);
+ROUTER.patch("/location/:id", lodgesControllers.changeLocation);
 ROUTER.get("/user/:userId", lodgesControllers.getLodgesByUserId);
 ROUTER.delete("/delete/all", lodgesControllers.deleteAllLodges);
 
