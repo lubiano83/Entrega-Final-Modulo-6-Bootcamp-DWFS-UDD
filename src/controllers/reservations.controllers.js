@@ -129,6 +129,7 @@ export default class ReservationsController {
             if(!user) return res.status(404).send({ message: "Usuario no econtrado.." });
             const lodge = await lodgesDao.getById(lodgeId);
             if(!lodge) return res.status(404).send({ message: "Cabaña no econtrada.." });
+            if(lodge.available === false) return res.status(400).send({ message: "Esa cabaña no esta disponible.." });
             if(String(user._id) === String(lodge.userId)) return res.status(400).send({ message: "No puedes reservar una cabaña de tu propiedad.." });
             const lodgeOwner = await usersDao.getById(lodge.userId);
             if(!lodgeOwner) return res.status(404).send({ message: "Dueño de la cabaña no encontrado.." });
@@ -140,7 +141,6 @@ export default class ReservationsController {
             const modifiedData = { user: userId, lodge: lodgeId, name: `${user.first_name} ${user.last_name}`, contact: lodgeOwner.email, email: user.email, people: Number(people), arrive: new Date(arrive), leave: new Date(leave), price: Number(price), paid: false, mapUrl: String(lodge.mapUrl) };
             if( isNaN(Number(people))) return res.status(400).send({ message: "El campo: people, debe ser tipo number.." });
             if(people < 1 || people > lodge.capacity) return res.status(400).send({ message: `Ese lodge tiene una capacidad maxima entre 1 y ${lodge.capacity} personas` });
-            if(lodge.available === false) return res.status(400).send({ message: "Esa cabaña no esta disponible.." });
             if(modifiedData.people > lodge.capacity) return res.status(400).send({ message: `La capacidad maxima es de ${lodge.capacity} personas..` });
             const conflict = await this.#confirmReservationDate(modifiedData, lodgeId);
             if (conflict) return res.status(400).send({ message: "Esta cabaña ya está reservada en las fechas seleccionadas.." });
