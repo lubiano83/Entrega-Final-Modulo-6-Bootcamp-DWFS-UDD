@@ -23,7 +23,7 @@ const seasonSchema = new mongoose.Schema({
         required: true,
         trim: true
     }
-});
+}, { timestamps: true });
 
 const SeasonModel = mongoose.models[collection] || mongoose.model(collection, seasonSchema);
 export default SeasonModel;

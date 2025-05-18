@@ -19,7 +19,7 @@ const sessionSchema = new mongoose.Schema({
         default: moment().format("HH:mm:ss"),
         expires: 3600
     },
-});
+}, { timestamps: true });
 
 sessionSchema.pre(/^find/, function (next) {
     this.populate("userId")

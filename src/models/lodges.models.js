@@ -72,7 +72,7 @@ const lodgeSchema = new mongoose.Schema({
         type: String,
         default: ""
     }
-});
+}, { timestamps: true });
 
 lodgeSchema.plugin(paginate);
 

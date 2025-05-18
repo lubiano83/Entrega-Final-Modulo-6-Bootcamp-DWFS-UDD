@@ -63,15 +63,7 @@ const userSchema = new mongoose.Schema({
         enum: [ "free", "premium", "gold" ],
         default: "free"
     },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    updatedAt: {
-        type: Date,
-        default: Date.now,
-    }
-});
+}, { timestamps: true });
 
 userSchema.plugin(paginate);
 

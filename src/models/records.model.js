@@ -34,7 +34,7 @@ const recordSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-});
+}, { timestamps: true });
 
 recordSchema.plugin(paginate);
 
