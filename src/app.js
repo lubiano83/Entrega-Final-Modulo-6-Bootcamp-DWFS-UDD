@@ -20,7 +20,7 @@ const HOST = "localhost";
 
 // Direcciones
 const allowedOrigins = [
-  "http://localhost:5173",
+  // "http://localhost:5173",
   "https://las-trancas-lodges.netlify.app"
 ];
 
