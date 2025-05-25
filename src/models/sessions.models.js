@@ -14,11 +14,6 @@ const sessionSchema = new mongoose.Schema({
         unique: true,
         required: true,
     },
-    createdAt: {
-        type: String,
-        default: moment().format("HH:mm:ss"),
-        expires: 3600
-    },
 }, { timestamps: true });
 
 sessionSchema.pre(/^find/, function (next) {
