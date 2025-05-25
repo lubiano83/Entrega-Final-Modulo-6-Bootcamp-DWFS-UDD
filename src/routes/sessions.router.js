@@ -15,6 +15,7 @@ ROUTER.post("/logout", sessionsControllers.logoutUser);
 ROUTER.get("/users/registered", sessionsControllers.usersRegistered);
 ROUTER.get("/users/logged", sessionsControllers.usersLogged);
 ROUTER.get("/current/user", sessionsControllers.getCurrentSession);
+ROUTER.patch("/email/restart", sessionsControllers.restartPasswordByEmail);
 ROUTER.delete("/delete/all", sessionsControllers.deleteAllSessions);
 
 export default ROUTER;

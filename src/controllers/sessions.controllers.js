@@ -2,11 +2,22 @@ import SessionsDao from "../dao/sessions.dao.js";
 import UsersDao from "../dao/users.dao.js";
 import { createHash, isValidPassword } from "../utils/bcrypt.utils.js";
 import jwt from "jsonwebtoken";
+import { sendPasswordEmail } from "../utils/nodemailer.utils.js";
 
 const sessionsDao = new SessionsDao();
 const usersDao = new UsersDao();
 
 export default class SessionsControllers {
+
+    #generateRandomPassword = (length) => {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        let password = '';
+        for (let i = 0; i < length; i++) {
+            const randomIndex = Math.floor(Math.random() * characters.length);
+            password += characters[randomIndex];
+        }
+        return password;
+    }
 
     getSessions = async(req, res) => {
         try {
@@ -115,6 +126,20 @@ export default class SessionsControllers {
             const user = await usersDao.getById(session.userId._id);
             if (!user) return res.status(404).send({ message: "Usuario no encontrado.." });
             return res.status(200).send({ message: "Sesion encontrada con exito..", token });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
+    restartPasswordByEmail = async(req, res) => {
+        try {
+            const { email } = req.body;
+            const user = await usersDao.getByProperty({ email });
+            const password = this.#generateRandomPassword(8);
+            await usersDao.updateById(user[0]._id, { password: await createHash(String(password).trim())});
+            const sendPassword = await sendPasswordEmail(user[0], password);
+            if(!sendPassword) return res.status(400).send({ message: "No se pudo restablecer la contraseña, intentalo denuevo.." });
+            return res.status(201).send({ message: "Contraseña restablecida con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
