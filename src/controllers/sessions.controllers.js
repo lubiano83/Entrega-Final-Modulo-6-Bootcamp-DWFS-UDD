@@ -53,15 +53,21 @@ export default class SessionsControllers {
         try {
             const { email, password } = req.body;
             if( !email || !password ) return res.status( 400 ).send({ message: "Todos los campos son requeridos.." });
-            const users = await usersDao.getByProperty({ email: email.toLowerCase().trim() });
+            let users = await usersDao.getByProperty({ email: email.toLowerCase().trim() });
             if( users.length === 0 ) return res.status( 404 ).send({ message: "Ese email no esta registrado.." });
+            if(users[0].loginAttempts >= 3) return res.status(423).send({ message: "Tu cuenta a sido bloqueada, debes cambiar tu contraseña.." });
             const passwordMatch = await isValidPassword(users[0], String(password).trim());
-            if ( !passwordMatch ) return res.status( 401 ).send({ status: 401, message: "La contraseña es incorrecta.." });
+            if ( !passwordMatch ) {
+                users[0].loginAttempts++;
+                await usersDao.updateById(users[0]._id, { loginAttempts: users[0].loginAttempts++ });
+                return res.status( 401 ).send({ status: 401, message: "La contraseña es incorrecta.." });
+            };
             const userLogged = req.cookies[ process.env.COOKIE_NAME ];
             if ( userLogged ) return res.status( 409 ).send({ message: "Ese usuario ya está logeado.." });
             const token = jwt.sign({ id: users[0]._id, email: users[0].email.toLowerCase(), first_name: users[0].first_name.toLowerCase(), last_name: users[0].last_name.toLowerCase(), phone: users[0].phone, role: users[0].role.toLowerCase(), id: users[0]._id.toString() }, process.env.COOKIE_KEY, { expiresIn: "1h" });
             res.cookie(process.env.COOKIE_NAME, token, { httpOnly: true, secure: true, sameSite: "none", path: "/", maxAge: 1000 * 60 * 60 });
             await sessionsDao.create(users[0]._id, token);
+            await usersDao.updateById(users[0]._id, { loginAttempts: 0 });
             return res.status( 200 ).send({ message: "Login realizado con éxito", token });
         } catch ( error ) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });

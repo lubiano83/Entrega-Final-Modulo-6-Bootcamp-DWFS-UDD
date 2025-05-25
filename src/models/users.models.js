@@ -63,6 +63,10 @@ const userSchema = new mongoose.Schema({
         enum: [ "free", "premium", "gold" ],
         default: "free"
     },
+    loginAttempts: {
+        type: Number,
+        default: 0
+    }
 }, { timestamps: true });
 
 userSchema.plugin(paginate);
