@@ -1,21 +1,24 @@
 import { Router } from "express";
+import passport from "passport";
 import LodgesControllers from "../controllers/lodges.controllers.js";
 import { uploadProfile, convertToWebp } from "../middlewares/uploader.middlewares.js";
+import { justUsers, justAdmin, justDev } from "../middlewares/auth.middlewares.js";
 
 const ROUTER = Router();
 const lodgesControllers = new LodgesControllers();
+const permissions = passport.authenticate("current", { session: false });
 
-ROUTER.get("/", lodgesControllers.getLodges);
-ROUTER.post("/:userId", lodgesControllers.createLodge);
-ROUTER.get("/:id", lodgesControllers.getLodgeById);
-ROUTER.put("/:id",lodgesControllers.updateLogdeById);
-ROUTER.patch("/:id", uploadProfile.single("image"), convertToWebp, lodgesControllers.addImageToLodge);
-ROUTER.delete("/:id", lodgesControllers.deleteLodgeById);
-ROUTER.delete("/image/:id", lodgesControllers.deleteAllImageFromLodge);
-ROUTER.patch("/wifi/:id", lodgesControllers.changeWifiById);
-ROUTER.patch("/available/:id", lodgesControllers.changeAvailableById);
-ROUTER.patch("/location/:id", lodgesControllers.changeLocation);
-ROUTER.get("/user/:userId", lodgesControllers.getLodgesByUserId);
-ROUTER.delete("/delete/all", lodgesControllers.deleteAllLodges);
+ROUTER.get("/", permissions, justUsers, lodgesControllers.getLodges);
+ROUTER.post("/:userId", permissions, justUsers, lodgesControllers.createLodge);
+ROUTER.get("/:id", permissions, justUsers, lodgesControllers.getLodgeById);
+ROUTER.put("/:id", permissions, justUsers, lodgesControllers.updateLogdeById);
+ROUTER.patch("/:id", permissions, justUsers, uploadProfile.single("image"), convertToWebp, lodgesControllers.addImageToLodge);
+ROUTER.delete("/:id", permissions, justUsers, lodgesControllers.deleteLodgeById);
+ROUTER.delete("/image/:id", permissions, justUsers, lodgesControllers.deleteAllImageFromLodge);
+ROUTER.patch("/wifi/:id", permissions, justUsers, lodgesControllers.changeWifiById);
+ROUTER.patch("/available/:id", permissions, justUsers, lodgesControllers.changeAvailableById);
+ROUTER.patch("/location/:id", permissions, justUsers, lodgesControllers.changeLocation);
+ROUTER.get("/user/:userId", permissions, justUsers, lodgesControllers.getLodgesByUserId);
+ROUTER.delete("/delete/all", permissions, justUsers, lodgesControllers.deleteAllLodges);
 
 export default ROUTER;
