@@ -59,7 +59,7 @@ export default class SessionsControllers {
             const passwordMatch = await isValidPassword(users[0], String(password).trim());
             if ( !passwordMatch ) {
                 users[0].loginAttempts++;
-                await usersDao.updateById(users[0]._id, { loginAttempts: users[0].loginAttempts++ });
+                await usersDao.updateById(users[0]._id, { loginAttempts: users[0].loginAttempts });
                 return res.status( 401 ).send({ status: 401, message: "La contraseña es incorrecta.." });
             };
             const userLogged = req.cookies[ process.env.COOKIE_NAME ];
