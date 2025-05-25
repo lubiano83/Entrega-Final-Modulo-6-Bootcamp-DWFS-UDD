@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-import moment from "moment";
 
 const collection = "sessions";
 
@@ -17,7 +16,7 @@ const sessionSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 sessionSchema.pre(/^find/, function (next) {
-    this.populate("userId")
+    this.populate("userId");
     next();
 });
 
