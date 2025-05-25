@@ -1,9 +1,12 @@
 import { Router } from "express";
 import LodgesControllers from "../controllers/lodges.controllers.js";
 import { uploadProfile, convertToWebp } from "../middlewares/uploader.middlewares.js";
+import passport from "passport";
+import { justUsers, justAdmin, justDev } from "../middlewares/auth.middlewares.js";
 
 const ROUTER = Router();
 const lodgesControllers = new LodgesControllers();
+const permissions = passport.authenticate("current", { session: false });
 
 ROUTER.get("/", lodgesControllers.getLodges);
 ROUTER.post("/:userId", lodgesControllers.createLodge);

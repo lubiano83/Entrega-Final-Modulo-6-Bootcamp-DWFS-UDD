@@ -1,8 +1,11 @@
 import { Router } from "express";
 import SessionsControllers from "../controllers/sessions.controllers.js";
+import passport from "passport";
+import { justUsers, justAdmin, justDev } from "../middlewares/auth.middlewares.js";
 
 const ROUTER = Router();
 const sessionsControllers = new SessionsControllers();
+const permissions = passport.authenticate("current", { session: false });
 
 ROUTER.get("/", sessionsControllers.getSessions);
 ROUTER.get("/:userId", sessionsControllers.getSessionById);
