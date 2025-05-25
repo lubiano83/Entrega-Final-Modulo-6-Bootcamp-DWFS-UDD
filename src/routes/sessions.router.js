@@ -12,9 +12,9 @@ ROUTER.get("/:userId", permissions, justUsers, sessionsControllers.getSessionByI
 ROUTER.post("/register", sessionsControllers.registerUser);
 ROUTER.post("/login", sessionsControllers.loginUser);
 ROUTER.post("/logout", permissions, justUsers, sessionsControllers.logoutUser);
-ROUTER.get("/users/registered", permissions, justUsers, sessionsControllers.usersRegistered);
-ROUTER.get("/users/logged", permissions, justUsers, sessionsControllers.usersLogged);
-ROUTER.get("/current/user", permissions, justUsers, sessionsControllers.getCurrentSession);
-ROUTER.delete("/delete/all", permissions, justUsers, sessionsControllers.deleteAllSessions);
+ROUTER.get("/users/registered", permissions, justAdmin, sessionsControllers.usersRegistered);
+ROUTER.get("/users/logged", permissions, justAdmin, sessionsControllers.usersLogged);
+ROUTER.get("/current/user", sessionsControllers.getCurrentSession);
+ROUTER.delete("/delete/all", permissions, justDev, sessionsControllers.deleteAllSessions);
 
 export default ROUTER;
