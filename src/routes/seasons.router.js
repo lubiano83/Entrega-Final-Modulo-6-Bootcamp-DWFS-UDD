@@ -1,13 +1,11 @@
 import { Router } from "express";
-import passport from "passport";
 import SeasonsController from "../controllers/seasons.controllers.js";
-import { justUsers, justAdmin, justDev } from "../middlewares/auth.middlewares.js";
+
+const seasonsController = new SeasonsController();
 
 const ROUTER = Router();
-const seasonsController = new SeasonsController();
-const permissions = passport.authenticate("current", { session: false });
 
-ROUTER.get("/", permissions, justAdmin, seasonsController.getSeasons);
-ROUTER.post("/", permissions, justAdmin, seasonsController.createSeason);
+ROUTER.get("/", seasonsController.getSeasons);
+ROUTER.post("/", seasonsController.createSeason);
 
 export default ROUTER;
