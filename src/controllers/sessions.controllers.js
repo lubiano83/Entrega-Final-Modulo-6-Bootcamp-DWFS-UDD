@@ -159,8 +159,7 @@ export default class SessionsControllers {
                 await usersDao.updateById(user[0]._id, { loginAttempts: user[0].loginAttempts });
                 return res.status( 401 ).send({ status: 401, message: "La contraseña es incorrecta.." });
             };
-            await usersDao.updateById(user[0]._id, { password: await createHash(String(newPassword).trim())});
-            await usersDao.updateById(user[0]._id, { loginAttempts: 0 });
+            await usersDao.updateById(user[0]._id, { password: await createHash(String(newPassword).trim()), loginAttempts: 0 });
             return res.status(200).send({ message: "Tu contraseña a sido cambiada con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
