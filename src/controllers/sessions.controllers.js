@@ -64,7 +64,7 @@ export default class SessionsControllers {
         try {
             const { email, password } = req.body;
             if( !email || !password ) return res.status( 400 ).send({ message: "Todos los campos son requeridos.." });
-            let users = await usersDao.getByProperty({ email: email.toLowerCase().trim() });
+            const users = await usersDao.getByProperty({ email: email.toLowerCase().trim() });
             if( users.length === 0 ) return res.status( 404 ).send({ message: "Ese email no esta registrado.." });
             if(users[0].loginAttempts >= 3) return res.status(423).send({ message: "Tu cuenta a sido bloqueada, debes cambiar tu contraseña.." });
             const passwordMatch = await isValidPassword(users[0], String(password).trim());
@@ -138,8 +138,30 @@ export default class SessionsControllers {
             const password = this.#generateRandomPassword(8);
             await usersDao.updateById(user[0]._id, { password: await createHash(String(password).trim())});
             const sendPassword = await sendPasswordEmail(user[0], password);
-            if(!sendPassword) return res.status(400).send({ message: "No se pudo restablecer la contraseña, intentalo denuevo.." });
+            if(!sendPassword) return res.status(400).send({ message: "No se pudo restablecer la contraseña, intentalo nuevamente.." });
+            await usersDao.updateById(user[0]._id, { loginAttempts: 0 });
             return res.status(201).send({ message: "Contraseña restablecida con exito.." });
+        } catch (error) {
+            return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
+        }
+    };
+
+    changePassword = async(req, res) => {
+        try {
+            const { email } = req.params;
+            const { password, newPassword } = req.body;
+            if (String(newPassword).trim().length < 6 || String(newPassword).trim().length > 8) return res.status(409).send({ message: "La contraseña debe tener entre 6 y 8 caracteres.." });
+            const user = await usersDao.getByProperty({ email });
+            if(user[0].loginAttempts >= 3) return res.status(423).send({ message: "Tu cuenta a sido bloqueada, debes cambiar tu contraseña.." });
+            const passwordMatch = await isValidPassword(user[0], String(password).trim());
+            if ( !passwordMatch ) {
+                user[0].loginAttempts++;
+                await usersDao.updateById(user[0]._id, { loginAttempts: user[0].loginAttempts });
+                return res.status( 401 ).send({ status: 401, message: "La contraseña es incorrecta.." });
+            };
+            await usersDao.updateById(user[0]._id, { password: await createHash(String(newPassword).trim())});
+            await usersDao.updateById(user[0]._id, { loginAttempts: 0 });
+            return res.status(200).send({ message: "Tu contraseña a sido cambiada con exito.." });
         } catch (error) {
             return res.status( 500 ).send({ message: "Error al obtener datos desde el servidor..", error: error.message });
         }
