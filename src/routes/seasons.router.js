@@ -7,7 +7,7 @@ const ROUTER = Router();
 const seasonsController = new SeasonsController();
 const permissions = passport.authenticate("current", { session: false });
 
-ROUTER.get("/", seasonsController.getSeasons);
-ROUTER.post("/", seasonsController.createSeason);
+ROUTER.get("/", permissions, justAdmin, seasonsController.getSeasons);
+ROUTER.post("/", permissions, justAdmin, seasonsController.createSeason);
 
 export default ROUTER;

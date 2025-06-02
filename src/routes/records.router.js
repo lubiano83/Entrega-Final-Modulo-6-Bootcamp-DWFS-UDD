@@ -7,10 +7,10 @@ const ROUTER = Router();
 const recordsController = new RecordsControllers();
 const permissions = passport.authenticate("current", { session: false });
 
-ROUTER.get("/", recordsController.getRecords);
-ROUTER.get("/:id", recordsController.getRecordById);
-ROUTER.delete("/:id", recordsController.deleteRecordById);
-ROUTER.get("/user/:userId", recordsController.getRecordsByUserId);
-ROUTER.delete("/delete/all", recordsController.deleteAllRecords);
+ROUTER.get("/", permissions, justUsers, recordsController.getRecords);
+ROUTER.get("/:id", permissions, justUsers, recordsController.getRecordById);
+ROUTER.delete("/:id", permissions, justUsers, recordsController.deleteRecordById);
+ROUTER.get("/user/:userId", permissions, justUsers, recordsController.getRecordsByUserId);
+ROUTER.delete("/delete/all", permissions, justDev, recordsController.deleteAllRecords);
 
 export default ROUTER;
