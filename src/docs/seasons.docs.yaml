@@ -12,8 +12,7 @@ paths:
     get:
       summary: Obtener temporadas
       description: Retorna todas las temporadas definidas en el sistema.
-      tags:
-        - Seasons
+      tags: [Seasons]
       responses:
         '200':
           description: Lista de temporadas obtenida con éxito.
@@ -52,8 +51,7 @@ paths:
     post:
       summary: Crear nueva temporada
       description: Crea una nueva configuración de temporada. Este endpoint reemplaza todas las temporadas existentes.
-      tags:
-        - Seasons
+      tags: [Seasons]
       requestBody:
         required: true
         content:

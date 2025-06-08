@@ -13,8 +13,7 @@ paths:
     get:
       summary: Obtener lodges filtrados
       description: Devuelve una lista paginada de lodges con filtros opcionales.
-      tags:
-        - Lodges
+      tags: [Lodges]
       parameters:
         - in: query
           name: hotel
@@ -33,10 +32,10 @@ paths:
           schema: { type: integer }
         - in: query
           name: wifi
-          schema: { type: string, enum: [true, false] }
+          schema: { type: string, enum: ["true", "false"] }
         - in: query
           name: available
-          schema: { type: string, enum: [true, false] }
+          schema: { type: string, enum: ["true", "false"] }
         - in: query
           name: high
           schema: { type: number }
@@ -53,44 +52,33 @@ paths:
           name: limit
           schema: { type: integer, default: 10 }
       responses:
-        '200':
-          description: Lista de lodges filtrada y paginada.
-        '500':
-          description: Error del servidor.
+        '200': { description: Lista de lodges filtrada y paginada. }
+        '500': { description: Error del servidor. }
 
     delete:
       summary: Eliminar todos los lodges
-      description: Borra todos los registros de cabañas.
-      tags:
-        - Lodges
+      tags: [Lodges]
       responses:
-        '200':
-          description: Todos los lodges eliminados con éxito.
-        '500':
-          description: Error del servidor.
+        '200': { description: Todos los lodges eliminados con éxito. }
+        '500': { description: Error del servidor. }
 
   /api/lodges/{id}:
     get:
       summary: Obtener lodge por ID
-      tags:
-        - Lodges
+      tags: [Lodges]
       parameters:
         - in: path
           name: id
           required: true
           schema: { type: string }
       responses:
-        '200':
-          description: Lodge encontrado.
-        '404':
-          description: Lodge no existe.
-        '500':
-          description: Error del servidor.
+        '200': { description: Lodge encontrado. }
+        '404': { description: Lodge no existe. }
+        '500': { description: Error del servidor. }
 
     put:
       summary: Actualizar lodge por ID
-      tags:
-        - Lodges
+      tags: [Lodges]
       parameters:
         - in: path
           name: id
@@ -102,35 +90,29 @@ paths:
           application/json:
             schema:
               type: object
-              required: [hotel, size, bedroom, bathroom, capacity, wifi, season]
+              required: [hotel, size, bedroom, bathroom, capacity, season]
               properties:
-                hotel: { type: string, example: "cabaña el bosque" }
-                size: { type: number, example: 90 }
-                bedroom: { type: number, example: 3 }
-                bathroom: { type: number, example: 2 }
-                capacity: { type: number, example: 6 }
-                wifi: { type: boolean, example: true }
+                hotel: { type: string }
+                size: { type: number }
+                bedroom: { type: number }
+                bathroom: { type: number }
+                capacity: { type: number }
                 season:
                   type: object
                   required: [high, medium, low]
                   properties:
-                    high: { type: number, example: 130000 }
-                    medium: { type: number, example: 100000 }
-                    low: { type: number, example: 75000 }
+                    high: { type: number }
+                    medium: { type: number }
+                    low: { type: number }
       responses:
-        '200':
-          description: Lodge actualizado con éxito.
-        '400':
-          description: Datos inválidos.
-        '404':
-          description: Lodge no encontrado.
-        '500':
-          description: Error del servidor.
+        '200': { description: Lodge actualizado con éxito. }
+        '400': { description: Datos inválidos. }
+        '404': { description: Lodge no encontrado. }
+        '500': { description: Error del servidor. }
 
     patch:
       summary: Agregar imagen al lodge
-      tags:
-        - Lodges
+      tags: [Lodges]
       parameters:
         - in: path
           name: id
@@ -139,83 +121,106 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               required: [image]
               properties:
                 image:
                   type: string
-                  example: "https://url.com/imagen.jpg"
+                  format: binary
       responses:
-        '200':
-          description: Imagen agregada con éxito.
-        '400':
-          description: Faltan campos.
-        '404':
-          description: Lodge no encontrado.
-        '500':
-          description: Error del servidor.
+        '200': { description: Imagen agregada con éxito. }
+        '400': { description: Faltan campos o imagen. }
+        '404': { description: Lodge no encontrado. }
+        '500': { description: Error del servidor. }
 
     delete:
       summary: Eliminar lodge por ID
-      tags:
-        - Lodges
+      tags: [Lodges]
       parameters:
         - in: path
           name: id
           required: true
           schema: { type: string }
       responses:
-        '200':
-          description: Lodge eliminado con éxito.
-        '404':
-          description: Lodge no encontrado.
-        '500':
-          description: Error del servidor.
+        '200': { description: Lodge eliminado con éxito. }
+        '400': { description: No se puede eliminar, tiene reservas o historial. }
+        '404': { description: Lodge o usuario no encontrado. }
+        '500': { description: Error del servidor. }
 
   /api/lodges/image/{id}:
     delete:
       summary: Eliminar todas las imágenes de un lodge
-      tags:
-        - Lodges
+      tags: [Lodges]
       parameters:
         - in: path
           name: id
           required: true
           schema: { type: string }
       responses:
-        '200':
-          description: Imágenes eliminadas con éxito.
-        '404':
-          description: Lodge no encontrado.
-        '500':
-          description: Error del servidor.
+        '200': { description: Imágenes eliminadas con éxito. }
+        '404': { description: Lodge no encontrado. }
+        '500': { description: Error del servidor. }
 
   /api/lodges/available/{id}:
     patch:
       summary: Cambiar disponibilidad de lodge
-      tags:
-        - Lodges
+      tags: [Lodges]
       parameters:
         - in: path
           name: id
           required: true
           schema: { type: string }
       responses:
-        '200':
-          description: Disponibilidad cambiada con éxito.
-        '404':
-          description: Lodge no encontrado.
-        '500':
-          description: Error del servidor.
+        '200': { description: Disponibilidad cambiada con éxito. }
+        '400': { description: Falta imagen o ubicación. }
+        '404': { description: Lodge no encontrado. }
+        '500': { description: Error del servidor. }
+
+  /api/lodges/wifi/{id}:
+    patch:
+      summary: Cambiar estado del wifi del lodge
+      tags: [Lodges]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Wifi cambiado con éxito. }
+        '404': { description: Lodge no encontrado. }
+        '500': { description: Error del servidor. }
+
+  /api/lodges/location/{id}:
+    patch:
+      summary: Establecer ubicación en el lodge
+      tags: [Lodges]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [mapUrl]
+              properties:
+                mapUrl:
+                  type: string
+      responses:
+        '200': { description: Ubicación establecida con éxito. }
+        '400': { description: Ubicación no válida. }
+        '404': { description: Lodge no encontrado. }
+        '500': { description: Error del servidor. }
 
   /api/lodges/{userId}:
     post:
       summary: Crear lodge asociado a un usuario
-      description: Crea un nuevo lodge para el usuario dado.
-      tags:
-        - Lodges
+      tags: [Lodges]
       parameters:
         - in: path
           name: userId
@@ -229,40 +234,42 @@ paths:
               type: object
               required: [hotel, size, bedroom, bathroom, capacity, season]
               properties:
-                hotel: { type: string, example: "cabaña el sol" }
-                size: { type: number, example: 80 }
-                bedroom: { type: number, example: 3 }
-                bathroom: { type: number, example: 2 }
-                capacity: { type: number, example: 6 }
+                hotel: { type: string }
+                size: { type: number }
+                bedroom: { type: number }
+                bathroom: { type: number }
+                capacity: { type: number }
                 season:
                   type: object
                   required: [high, medium, low]
                   properties:
-                    high: { type: number, example: 120000 }
-                    medium: { type: number, example: 95000 }
-                    low: { type: number, example: 75000 }
+                    high: { type: number }
+                    medium: { type: number }
+                    low: { type: number }
       responses:
-        '201':
-          description: Lodge creado con éxito.
-        '400':
-          description: Datos inválidos.
-        '500':
-          description: Error del servidor.
+        '201': { description: Lodge creado con éxito. }
+        '400': { description: Datos inválidos o límite alcanzado. }
+        '404': { description: Usuario no encontrado. }
+        '500': { description: Error del servidor. }
 
   /api/lodges/user/{userId}:
     get:
       summary: Obtener todos los lodges de un usuario
-      tags:
-        - Lodges
+      tags: [Lodges]
       parameters:
         - in: path
           name: userId
           required: true
           schema: { type: string }
       responses:
-        '200':
-          description: Lista de lodges del usuario.
-        '400':
-          description: El userId no existe.
-        '500':
-          description: Error del servidor.
+        '200': { description: Lista de lodges del usuario. }
+        '400': { description: El userId no existe. }
+        '500': { description: Error del servidor. }
+
+  /api/lodges/delete/all:
+    delete:
+      summary: Eliminar todos los lodges (solo dev)
+      tags: [Lodges]
+      responses:
+        '200': { description: Todos los lodges eliminados con éxito. }
+        '500': { description: Error del servidor. }

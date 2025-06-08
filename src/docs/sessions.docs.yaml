@@ -18,59 +18,31 @@ security:
   - bearerAuth: []
 
 paths:
-
   /api/sessions:
     get:
-      summary: "Obtener todas las sesiones"
+      summary: Obtener todas las sesiones
       tags: [Sessions]
       responses:
-        '200':
-          description: "Sesiones obtenidas con éxito."
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  payload:
-                    type: array
-                    items:
-                      type: object
-        '500':
-          description: "Error interno del servidor."
+        '200': { description: Sesiones obtenidas con éxito. }
+        '500': { description: Error interno del servidor. }
 
   /api/sessions/{userId}:
     get:
-      summary: "Obtener sesión por ID de usuario"
+      summary: Obtener sesión por ID de usuario
       tags: [Sessions]
       parameters:
         - in: path
           name: userId
           required: true
-          schema:
-            type: string
-          description: "ID del usuario"
+          schema: { type: string }
       responses:
-        '200':
-          description: "Sesión obtenida con éxito."
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  payload:
-                    type: object
-        '404':
-          description: "Sesión no encontrada."
-        '500':
-          description: "Error interno del servidor."
+        '200': { description: Sesión obtenida con éxito. }
+        '404': { description: Sesión no encontrada. }
+        '500': { description: Error interno del servidor. }
 
   /api/sessions/register:
     post:
-      summary: "Registrar un nuevo usuario"
+      summary: Registrar un nuevo usuario
       tags: [Sessions]
       requestBody:
         required: true
@@ -78,57 +50,31 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - first_name
-                - last_name
-                - email
-                - phone
-                - password
-                - address
+              required: [first_name, last_name, email, phone, password, address]
               properties:
-                first_name:
-                  type: string
-                last_name:
-                  type: string
-                email:
-                  type: string
-                  format: email
-                phone:
-                  type: string
-                password:
-                  type: string
+                first_name: { type: string }
+                last_name: { type: string }
+                email: { type: string, format: email }
+                phone: { type: string }
+                password: { type: string }
                 address:
                   type: object
-                  required:
-                    - country
-                    - state
-                    - city
-                    - street
-                    - number
+                  required: [country, state, city, street, number]
                   properties:
-                    country:
-                      type: string
-                    state:
-                      type: string
-                    city:
-                      type: string
-                    street:
-                      type: string
-                    number:
-                      type: string
+                    country: { type: string }
+                    state: { type: string }
+                    city: { type: string }
+                    street: { type: string }
+                    number: { type: string }
       responses:
-        '201':
-          description: "Usuario registrado con éxito."
-        '400':
-          description: "Datos inválidos o incompletos."
-        '409':
-          description: "Email ya registrado o contraseña inválida."
-        '500':
-          description: "Error interno del servidor."
+        '201': { description: Usuario registrado con éxito. }
+        '400': { description: Datos inválidos o incompletos. }
+        '409': { description: Email ya registrado o contraseña inválida. }
+        '500': { description: Error interno del servidor. }
 
   /api/sessions/login:
     post:
-      summary: "Login de usuario"
+      summary: Login de usuario
       tags: [Sessions]
       requestBody:
         required: true
@@ -136,106 +82,109 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - email
-                - password
+              required: [email, password]
               properties:
-                email:
-                  type: string
-                password:
-                  type: string
+                email: { type: string }
+                password: { type: string }
       responses:
-        '200':
-          description: "Login realizado con éxito."
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  token:
-                    type: string
-        '400':
-          description: "Faltan campos."
-        '401':
-          description: "Contraseña incorrecta."
-        '404':
-          description: "Email no registrado."
-        '409':
-          description: "Usuario ya logeado."
-        '500':
-          description: "Error interno del servidor."
+        '200': { description: Login realizado con éxito. }
+        '400': { description: Faltan campos. }
+        '401': { description: Contraseña incorrecta. }
+        '404': { description: Email no registrado. }
+        '409': { description: Usuario ya logeado. }
+        '500': { description: Error interno del servidor. }
 
   /api/sessions/logout:
     post:
-      summary: "Cerrar sesión"
+      summary: Cerrar sesión
       tags: [Sessions]
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: "Logout realizado con éxito."
-        '401':
-          description: "Token no encontrado."
-        '500':
-          description: "Error interno del servidor."
+        '200': { description: Logout realizado con éxito. }
+        '401': { description: Token no encontrado. }
+        '500': { description: Error interno del servidor. }
 
   /api/sessions/users/registered:
     get:
-      summary: "Cantidad de usuarios registrados"
+      summary: Cantidad de usuarios registrados
       tags: [Sessions]
       responses:
-        '200':
-          description: "Cantidad de usuarios obtenida."
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  payload:
-                    type: integer
-        '500':
-          description: "Error interno del servidor."
+        '200': { description: Cantidad de usuarios obtenida. }
+        '500': { description: Error interno del servidor. }
 
   /api/sessions/users/logged:
     get:
-      summary: "Cantidad de usuarios logueados"
+      summary: Cantidad de usuarios logueados
       tags: [Sessions]
       responses:
-        '200':
-          description: "Cantidad de sesiones activas."
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  payload:
-                    type: integer
-        '500':
-          description: "Error interno del servidor."
+        '200': { description: Cantidad de sesiones activas. }
+        '500': { description: Error interno del servidor. }
 
   /api/sessions/current/user:
     get:
-      summary: "Obtener sesión actual"
+      summary: Obtener sesión actual
       tags: [Sessions]
       security:
         - bearerAuth: []
       responses:
-        '200':
-          description: "Sesión encontrada con éxito."
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                  token:
-                    type: string
-        '401':
-          description: "Sesión no activa o inválida."
-        '404':
-          description: "Usuario no encontrado."
-        '500':
-          description: "Error interno del servidor."
+        '200': { description: Sesión encontrada con éxito. }
+        '401': { description: Sesión no activa o inválida. }
+        '404': { description: Usuario no encontrado. }
+        '500': { description: Error interno del servidor. }
+
+  /api/sessions/email/restart:
+    patch:
+      summary: Restablecer contraseña por email
+      tags: [Sessions]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email: { type: string }
+      responses:
+        '201': { description: Contraseña restablecida con éxito. }
+        '400': { description: No se pudo restablecer la contraseña. }
+        '500': { description: Error interno del servidor. }
+
+  /api/sessions/password/{email}:
+    patch:
+      summary: Cambiar contraseña actual por una nueva
+      tags: [Sessions]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [password, newPassword]
+              properties:
+                password: { type: string }
+                newPassword: { type: string }
+      responses:
+        '200': { description: Contraseña cambiada con éxito. }
+        '401': { description: Contraseña actual incorrecta. }
+        '409': { description: La nueva contraseña no cumple requisitos. }
+        '423': { description: Cuenta bloqueada. }
+        '500': { description: Error interno del servidor. }
+
+  /api/sessions/delete/all:
+    delete:
+      summary: Eliminar todas las sesiones (solo dev)
+      tags: [Sessions]
+      responses:
+        '200': { description: Todas las sesiones eliminadas con éxito. }
+        '500': { description: Error interno del servidor. }

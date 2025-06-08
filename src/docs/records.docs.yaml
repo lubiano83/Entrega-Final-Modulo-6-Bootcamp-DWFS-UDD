@@ -12,8 +12,7 @@ paths:
     get:
       summary: Obtener registros con filtros
       description: Retorna una lista paginada de registros con filtros opcionales y el total de ventas.
-      tags:
-        - Records
+      tags: [Records]
       parameters:
         - in: query
           name: lodge
@@ -40,53 +39,60 @@ paths:
           name: limit
           schema: { type: number, default: 10 }
       responses:
-        '200':
-          description: Lista de registros obtenida exitosamente.
-        '500':
-          description: Error al obtener datos desde el servidor.
+        '200': { description: Lista de registros obtenida exitosamente. }
+        '500': { description: Error al obtener datos desde el servidor. }
 
     delete:
       summary: Eliminar todos los registros
-      description: Borra todos los registros existentes en el sistema.
-      tags:
-        - Records
+      tags: [Records]
       responses:
-        '200':
-          description: Todos los registros eliminados exitosamente.
-        '500':
-          description: Error al obtener datos desde el servidor.
+        '200': { description: Todos los registros eliminados exitosamente. }
+        '500': { description: Error al obtener datos desde el servidor. }
 
   /api/records/{id}:
     get:
       summary: Obtener registro por ID
-      tags:
-        - Records
+      tags: [Records]
       parameters:
         - in: path
           name: id
           required: true
           schema: { type: string }
       responses:
-        '200':
-          description: Registro encontrado por ID.
-        '404':
-          description: Registro no encontrado.
-        '500':
-          description: Error al obtener datos desde el servidor.
+        '200': { description: Registro encontrado por ID. }
+        '404': { description: Registro no encontrado. }
+        '500': { description: Error al obtener datos desde el servidor. }
 
     delete:
       summary: Eliminar registro por ID
-      tags:
-        - Records
+      tags: [Records]
       parameters:
         - in: path
           name: id
           required: true
           schema: { type: string }
       responses:
-        '200':
-          description: Registro eliminado exitosamente.
-        '404':
-          description: Registro no encontrado.
-        '500':
-          description: Error al obtener datos desde el servidor.
+        '200': { description: Registro eliminado exitosamente. }
+        '404': { description: Registro no encontrado. }
+        '500': { description: Error al obtener datos desde el servidor. }
+
+  /api/records/user/{userId}:
+    get:
+      summary: Obtener registros que no pertenecen al usuario indicado
+      tags: [Records]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema: { type: string }
+      responses:
+        '200': { description: Lista de registros excluyendo los del usuario. }
+        '500': { description: Error al obtener datos desde el servidor. }
+
+  /api/records/delete/all:
+    delete:
+      summary: Eliminar todos los registros (solo dev)
+      tags: [Records]
+      responses:
+        '200': { description: Todos los registros eliminados exitosamente. }
+        '500': { description: Error al obtener datos desde el servidor. }
